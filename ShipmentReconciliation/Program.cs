@@ -10,80 +10,47 @@ namespace ShipmentReconciliation
     private static Data _data;
     private static DataWrapper _dataWrapper;
 
-    private enum Status { GenerateData, ProcessData, End}
-    private static Status _nextState;
     private static void Main(string[] args)
     {
-      //app name 
-      Console.WriteLine(System.Reflection.Assembly.GetEntryAssembly().FullName);
-
+      DisplayTitle();
       try
       {
-        InitializeOptions(args);
-        if (Settings.Default.Verbose)
+        LoadSettings(args);
+        DisplaySettings();
+        if (PromptStart())
         {
-          DisplayOptions();
+          GenerateData();
+          ProcessData();
         }
-        if (!Settings.Default.AutoStart)
-        {
-          Console.Write("Press 'Y' to continue, any other key to abort... ");
-          char c = Console.ReadKey().KeyChar;
-          Console.WriteLine();
-          if (c != 'Y' && c != 'y')
-          {
-            Console.WriteLine("Operation aborted.");
-            Settings.Default.AutoExit = true;
-            return;
-          }
-        }
-        RunStateMachine();
+      }
+      catch (ShipmentReconciliationException ex)
+      {
+        HandleWarning(ex);
       }
       catch (Exception ex)
       {
-        Console.WriteLine($"Error: {ex.Message}");
+        HandleError(ex);
       }
       finally
       {
-        if (!Settings.Default.AutoExit)
-        {
-          Console.WriteLine("Press ENTER to exit...");
-          Console.ReadLine();
-        }
+        PromptFinish();
       }
     }
 
-    private static void RunStateMachine()
+
+    private static void DisplayTitle()
     {
-      while (_nextState != Status.End)
-      {
-        switch (_nextState)
-        {
-          case Status.GenerateData:
-            if (Settings.Default.GenerateData)
-            {
-              GenerateData();
-            }
-            break;
-          case Status.ProcessData:
-            if (Settings.Default.ProcessData)
-            {
-              ProcessData();
-            }
-            break;
-          default:
-            return;
-        }
-      }
+      Console.WriteLine(System.Reflection.Assembly.GetEntryAssembly().FullName);
     }
 
-    private static void InitializeOptions(string[] args)
+    private static void LoadSettings(string[] args)
     {
-      var options = Settings.Default.Properties.Cast<SettingsProperty>();
+      System.Collections.Generic.IEnumerable<SettingsProperty> settings = Settings.Default.Properties.Cast<SettingsProperty>();
       foreach (string item in args)
       {
         string[] parts = item.Split("=".ToCharArray(), 2);
         string settingName = parts[0];
-        SettingsProperty setting = options.FirstOrDefault(p => p.Name == settingName);
+        SettingsProperty setting = settings.FirstOrDefault(p => p.Name == settingName);
         if (setting == null)
         {
           throw new ShipmentReconciliationException($"Invalid command line argument: {settingName}");
@@ -102,23 +69,34 @@ namespace ShipmentReconciliation
       }
     }
 
-    private static void DisplayOptions()
+    private static void DisplaySettings()
     {
-      var options = Settings.Default.Properties.OfType<SettingsProperty>().OrderBy(s =>s.Name);
-      
+      if (!Settings.Default.Verbose)
+      { return; }
+      IOrderedEnumerable<SettingsProperty> settings = Settings.Default.Properties.OfType<SettingsProperty>().OrderBy(s => s.Name);
+
       Console.WriteLine("Settings:");
-      foreach (var setting in options)
-      {        
+      foreach (SettingsProperty setting in settings)
+      {
         Console.WriteLine($"\t{setting.Name}:\t{Settings.Default.PropertyValues[setting.Name].PropertyValue:N0}");
       }
     }
 
-    private static void ProcessData()
+    private static bool PromptStart()
     {
-      Console.WriteLine("Loading data...");
-      _data = DataLoader.LoadFolder("DATA\\Test3");
-      Console.WriteLine("Loading data finished.");
-      _dataWrapper = new DataWrapper(_data);
+      if (!Settings.Default.AutoStart)
+      {
+        Console.Write("Press 'Y' to continue, any other key to abort... ");
+        char c = Console.ReadKey().KeyChar;
+        Console.WriteLine();
+        if (c != 'Y' && c != 'y')
+        {
+          Console.WriteLine("Operation aborted.");
+          Settings.Default.AutoExit = true;
+          return false;
+        }
+      }
+      return true;
     }
 
     /// <summary>
@@ -126,26 +104,73 @@ namespace ShipmentReconciliation
     /// </summary>
     private static void GenerateData()
     {
-      while (true)
+      if (!Settings.Default.GenerateData)
+      { return; }
+      Console.WriteLine("Generating data...");
+      _data = DataGenerator.Generate(
+          maxNumberOfProducts: Settings.Default.GenerateDataMaxNumberOfProducts,
+          maxNumberOfOrders: Settings.Default.GenerateDataMaxNumberOfOrders,
+          maxNumberOfCustomers: Settings.Default.GenerateDataMaxNumberOfCustomers,
+          maxQuantityPerOrder: Settings.Default.GenerateDataMaxQuantityPerOrder,
+          maxTotalQuantityPerProduct: Settings.Default.GenerateDataMaxQuantityPerProduct);
+      Console.WriteLine("Generating data finished.");
+
+      _dataWrapper = new DataWrapper(_data);
+      DisplaySummary(_dataWrapper);
+      SaveData();
+    }
+
+    private static void SaveData()
+    {
+      if (!string.IsNullOrEmpty(Settings.Default.FolderPath))
       {
-        Console.WriteLine("Generating data...");
-        _data = DataGenerator.Generate(
-            maxNumberOfProducts: Settings.Default.GenerateDataMaxNumberOfProducts,
-            maxNumberOfOrders: Settings.Default.GenerateDataMaxNumberOfOrders,
-            maxNumberOfCustomers: Settings.Default.GenerateDataMaxNumberOfCustomers,
-            maxQuantityPerOrder: Settings.Default.GenerateDataMaxQuantityPerOrder,
-            maxTotalQuantityPerProduct: Settings.Default.GenerateDataMaxQuantityPerProduct);
-        Console.WriteLine("Generating data finished.");
-
-        _dataWrapper = new DataWrapper(_data);
-        DisplaySummary(_dataWrapper);
-        if (!Settings.Default.GenerateDataUserInteractive)
-        { break; }
-
+        Console.WriteLine("Saving data...");
+        DataSaver.SaveToFolder(_data, Settings.Default.FolderPath);
+        Console.WriteLine("Saving data finished.");
       }
-      Console.WriteLine("Saving data...");
-      DataSaver.SaveToFolder(_data, "DATA\\Test3");
-      Console.WriteLine("Saving data finished.");
+      else if (!string.IsNullOrEmpty(Settings.Default.FilePathCustomerOrders) && !string.IsNullOrEmpty(Settings.Default.FilePathFactoryShipment))
+      {
+        Console.WriteLine("Saving Customer Orders...");
+        DataSaver.SaveToFile(_data.CustomerOrders, Settings.Default.FilePathCustomerOrders);
+        Console.WriteLine("Saving Customer Orders finished.");
+
+        Console.WriteLine("Saving Factory Shipments...");
+        DataSaver.SaveToFile(_data.FactoryShipments, Settings.Default.FilePathFactoryShipment);
+        Console.WriteLine("Saving Factory Shipments finished.");
+      }
+    }
+
+    private static void ProcessData()
+    {
+      LoadData();
+    }
+
+    private static void LoadData()
+    {
+      if (_data == null)
+      {
+        if (!string.IsNullOrEmpty(Settings.Default.FolderPath))
+        {
+          Console.WriteLine("Loading data...");
+          _data = DataLoader.LoadFolder(Settings.Default.FolderPath);
+          Console.WriteLine("Loading data finished.");
+        }
+        else if (!string.IsNullOrEmpty(Settings.Default.FilePathCustomerOrders) && !string.IsNullOrEmpty(Settings.Default.FilePathFactoryShipment))
+        {
+          Console.WriteLine("Loading Customer Orders...");
+          _data = DataLoader.LoadFiles(Settings.Default.FilePathCustomerOrders, Settings.Default.FilePathFactoryShipment);
+          Console.WriteLine("Loading Customer Orders finished.");
+
+        }
+        else
+        {
+          throw new ShipmentReconciliationException("Missing source path.");
+        }
+      }
+      if (_dataWrapper == null)
+      {
+        _dataWrapper = new DataWrapper(_data);
+      }
     }
 
     private static void DisplaySummary(DataWrapper dataWrapper, string title = "Summary:", string indent = "\t")
@@ -156,6 +181,26 @@ namespace ShipmentReconciliation
       Console.WriteLine($"{indent}Total Deficit: {dataWrapper.TotalDeficit:N0} items of {dataWrapper.CountProductDeficit:N0} products.");
       Console.WriteLine($"{indent}Total Surplus: {dataWrapper.TotalSurplus:N0} items of {dataWrapper.CountProductSurplus:N0} products.");
 
+    }
+
+    private static void HandleWarning(ShipmentReconciliationException ex)
+    {
+      Console.WriteLine($"Warning: {ex.Message}");
+    }
+
+    private static void HandleError(Exception ex)
+    {
+      Console.WriteLine($"Error: {ex.Message}");
+    }
+
+    private static void PromptFinish()
+    {
+      if (Settings.Default.AutoExit)
+      {
+        return;
+      }
+      Console.WriteLine("Press ENTER to exit...");
+      Console.ReadLine();
     }
   }
 }

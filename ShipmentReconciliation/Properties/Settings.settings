@@ -50,11 +50,5 @@
     <Setting Name="GenerateDataMaxQuantityPerProduct" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">10000</Value>
     </Setting>
-    <Setting Name="GenerateDataCreateSubfolder" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="GenerateDataCreateSubFolderName" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Test{0:000}</Value>
-    </Setting>
   </Settings>
 </SettingsFile>

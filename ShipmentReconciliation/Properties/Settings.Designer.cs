@@ -214,29 +214,5 @@ namespace ShipmentReconciliation.Properties {
                 this["GenerateDataMaxQuantityPerProduct"] = value;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool GenerateDataCreateSubfolder {
-            get {
-                return ((bool)(this["GenerateDataCreateSubfolder"]));
-            }
-            set {
-                this["GenerateDataCreateSubfolder"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Test{0:000}")]
-        public string GenerateDataCreateSubFolderName {
-            get {
-                return ((string)(this["GenerateDataCreateSubFolderName"]));
-            }
-            set {
-                this["GenerateDataCreateSubFolderName"] = value;
-            }
-        }
     }
 }
