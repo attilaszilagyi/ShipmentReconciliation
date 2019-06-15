@@ -1,0 +1,60 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="ShipmentReconciliation.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="GenerateData" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ProcessData" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="AutoStart" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="AutoExit" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="Verbose" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="FolderPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="FolderSearchSubs" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="FolderSearchPatternCustomerOrders" Type="System.String" Scope="User">
+      <Value Profile="(Default)">*CustomerOrders*.csv</Value>
+    </Setting>
+    <Setting Name="FolderSearchPatternFactoryShipment" Type="System.String" Scope="User">
+      <Value Profile="(Default)">*FactoryShipment*.csv</Value>
+    </Setting>
+    <Setting Name="FilePathCustomerOrders" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="FilePathFactoryShipment" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="GenerateDataMaxNumberOfProducts" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">3000</Value>
+    </Setting>
+    <Setting Name="GenerateDataMaxNumberOfOrders" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">150000</Value>
+    </Setting>
+    <Setting Name="GenerateDataMaxNumberOfCustomers" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">4000</Value>
+    </Setting>
+    <Setting Name="GenerateDataMaxQuantityPerOrder" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">3000</Value>
+    </Setting>
+    <Setting Name="GenerateDataMaxQuantityPerProduct" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">10000</Value>
+    </Setting>
+    <Setting Name="GenerateDataCreateSubfolder" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="GenerateDataCreateSubFolderName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Test{0:000}</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
