@@ -11,6 +11,8 @@ namespace ShipmentReconciliation
     private static DataWrapper _dataWrapper;
     private static CsvHelper.Configuration.Configuration _csvConfiguration;
 
+    private static readonly System.Action<string> progressChanged = text => { Console.Write("\r" + text.PadRight(100)); };
+
     private static void Main(string[] args)
     {
 
@@ -21,8 +23,18 @@ namespace ShipmentReconciliation
         DisplaySettings();
         if (PromptStart())
         {
-          GenerateData();
-          ProcessData();
+          if (Settings.Default.GenerateData)
+          {
+            GenerateData();
+            PreProcessData();
+            SaveData();
+          }
+          if (Settings.Default.ProcessData)
+          {
+            LoadData();
+            PreProcessData();
+            ProcessData();
+          }
         }
       }
       catch (ShipmentReconciliationException ex)
@@ -98,17 +110,25 @@ namespace ShipmentReconciliation
 
     private static bool PromptStart()
     {
-      if (!Settings.Default.AutoStart)
+      if (Settings.Default.GenerateData || Settings.Default.ProcessData)
       {
-        Console.Write("Press 'Y' to continue, any other key to abort... ");
-        char c = Console.ReadKey().KeyChar;
-        Console.WriteLine();
-        if (c != 'Y' && c != 'y')
+        if (!Settings.Default.AutoStart)
         {
-          Console.WriteLine("Operation aborted.");
-          Settings.Default.AutoExit = true;
-          return false;
+          Console.Write("Press 'Y' to continue, any other key to abort... ");
+          char c = Console.ReadKey().KeyChar;
+          Console.WriteLine();
+          if (c != 'Y' && c != 'y')
+          {
+            Console.WriteLine("Operation aborted.");
+            Settings.Default.AutoExit = true;
+            return false;
+          }
         }
+      }
+      else
+      {
+        Console.WriteLine("No operation selected to run.");
+        return false;
       }
       return true;
     }
@@ -118,60 +138,58 @@ namespace ShipmentReconciliation
     /// </summary>
     private static void GenerateData()
     {
-      if (!Settings.Default.GenerateData)
-      { return; }
-      Console.WriteLine("Generating data...");
+      Console.Write("Generating data...");
       _data = DataGenerator.Generate(
           maxNumberOfProducts: Settings.Default.GenerateDataMaxNumberOfProducts,
           maxNumberOfOrders: Settings.Default.GenerateDataMaxNumberOfOrders,
           maxNumberOfCustomers: Settings.Default.GenerateDataMaxNumberOfCustomers,
           maxQuantityPerOrder: Settings.Default.GenerateDataMaxQuantityPerOrder,
           maxTotalQuantityPerProduct: Settings.Default.GenerateDataMaxQuantityPerProduct);
-      Console.WriteLine("Generating data finished.");
-      if (Settings.Default.Verbose)
-      {
-        _dataWrapper = new DataWrapper(_data);
-        DisplaySummary(_dataWrapper);
-      }
-      SaveData();
+      Console.WriteLine("\rGenerating data finished. ");
     }
 
     private static void SaveData()
     {
+      Console.Write("Saving data... ");
       long id = DateTime.Now.Ticks;
       if (!string.IsNullOrEmpty(Settings.Default.FolderPath))
       {
-        Console.WriteLine("Saving data...");
         string folderPath = string.Format(Settings.Default.FolderPath, id);
-        Console.WriteLine($"\t{folderPath}");
+        Console.Write($"\rSaving data... {folderPath} ");
         DataFile.Save(_data, folderPath,
             customerOrdersCsvConfiguration: _csvConfiguration,
-            factoryShipmentsCsvConfiguration: _csvConfiguration);
-        Console.WriteLine("Saving data finished.");
+            factoryShipmentsCsvConfiguration: _csvConfiguration,
+            progressChanged: progressChanged);
+        Console.WriteLine($"\r\nSaving data finished. {folderPath} ");
       }
       else if (!string.IsNullOrEmpty(Settings.Default.FilePathCustomerOrders) && !string.IsNullOrEmpty(Settings.Default.FilePathFactoryShipment))
       {
-        Console.WriteLine("Saving Customer Orders...");
-        DataFile.Save(_data.CustomerOrders, Settings.Default.FilePathCustomerOrders, _csvConfiguration);
+        Console.Write("\rSaving Customer Orders... ");
+        DataFile.Save(_data.CustomerOrders, Settings.Default.FilePathCustomerOrders, _csvConfiguration,
+            progressChanged: progressChanged);
         Console.WriteLine("Saving Customer Orders finished.");
 
-        Console.WriteLine("Saving Factory Shipments...");
-        DataFile.Save(_data.FactoryShipments, Settings.Default.FilePathFactoryShipment, _csvConfiguration);
-        Console.WriteLine("Saving Factory Shipments finished.");
+        Console.Write("\rSaving Factory Shipments... ");
+        DataFile.Save(_data.FactoryShipments, Settings.Default.FilePathFactoryShipment, _csvConfiguration,
+            progressChanged: progressChanged);
+        Console.Write("\rSaving Factory Shipments finished.");
+        Console.WriteLine($"\rSaving data finished. ");
       }
-      else { Console.WriteLine("No saving path provided."); }
+      else
+      { Console.WriteLine("\rNo saving path provided."); }
+      
     }
 
     private static void ProcessData()
     {
-      LoadData();
+
     }
 
     private static void LoadData()
     {
       if (_data == null)
       {
-        Console.WriteLine("Loading data...");
+        Console.Write("Loading data... ");
         if (!string.IsNullOrEmpty(Settings.Default.FolderPath))
         {
           _data = DataFile.Load(
@@ -180,7 +198,8 @@ namespace ShipmentReconciliation
             Settings.Default.FolderSearchPatternCustomerOrders,
             Settings.Default.FolderSearchPatternFactoryShipment,
             customerOrdersCsvConfiguration: _csvConfiguration,
-            factoryShipmentsCsvConfiguration: _csvConfiguration);
+            factoryShipmentsCsvConfiguration: _csvConfiguration,
+            progressChanged: progressChanged);
         }
         else if (!string.IsNullOrEmpty(Settings.Default.FilePathCustomerOrders) && !string.IsNullOrEmpty(Settings.Default.FilePathFactoryShipment))
         {
@@ -188,22 +207,31 @@ namespace ShipmentReconciliation
             Settings.Default.FilePathCustomerOrders,
             Settings.Default.FilePathFactoryShipment,
             customerOrdersCsvConfiguration: _csvConfiguration,
-            factoryShipmentsCsvConfiguration: _csvConfiguration);
+            factoryShipmentsCsvConfiguration: _csvConfiguration,
+            progressChanged: progressChanged);
         }
         else
         {
           throw new ShipmentReconciliationException("Missing source path.");
         }
-        Console.WriteLine("Loading data finished.");
+        Console.WriteLine(/*"\rLoading data finished."*/);
       }
+    }
+
+    private static void PreProcessData()
+    {
       if (_dataWrapper == null)
       {
-        Console.WriteLine("Pre-processing data...");
+        Console.Write("Pre-processing data... ");
         _dataWrapper = new DataWrapper(_data);
-        Console.WriteLine("Pre-processing data finished.");
+        Console.Write("\rPre-processing data finished. ");
         if (Settings.Default.Verbose)
         {
           DisplaySummary(_dataWrapper);
+        }
+        else
+        {
+          Console.WriteLine();
         }
       }
     }
