@@ -33,7 +33,7 @@ namespace ShipmentReconciliation
         CustomerOrders = customerOrders,
         FactoryShipments = factoryShipments
       };
-      progressChanged?.Invoke($"{operation}. CustomerOrder: {cntRecordCustomerOrders:N0} records, FactoryShipment: {cntRecordFactoryShipments:N0} records.");
+      progressChanged?.Invoke($"{operation} CustomerOrder: {cntRecordCustomerOrders:N0} records, FactoryShipment: {cntRecordFactoryShipments:N0} records.");
       return inputData;
     }
 
