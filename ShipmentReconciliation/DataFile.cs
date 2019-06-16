@@ -13,17 +13,29 @@ namespace ShipmentReconciliation
       return (text.Length > max) ? "..." + text.Substring(text.Length - max) : text;
     }
 
-    private static int ProcessRecords<T>(IEnumerable<T> records, System.Action<T> process, System.Action<string> progressChanged, string progressOperation, int progressPerCnt = 100)
+    private static int ProcessRecords<T>(IEnumerable<T> records, System.Action<T> process, System.Action<string> progressChanged, string operation, int reportPerCount = 100)
     {
       int cntRecord = 0;      
       foreach (T item in records)
       {
         process(item);
         cntRecord++;
-        if (cntRecord % progressPerCnt == 0)
+        if (cntRecord % reportPerCount == 0)
         {
-          progressChanged($"{progressOperation} {cntRecord:N0}");
+          progressChanged($"{operation} {cntRecord:N0}");
         }
+      }
+      return cntRecord;
+    }
+
+    private static int ProcessRecords<T>(IEnumerable<T> records, System.Action<T> process, System.Action<int, string> progressChanged, string operation)
+    {
+      int cntRecord = 0;
+      foreach (T item in records)
+      {
+        cntRecord++;
+        progressChanged?.Invoke(cntRecord, operation);
+        process(item);
       }
       return cntRecord;
     }

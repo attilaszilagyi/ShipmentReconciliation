@@ -1,25 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace ShipmentReconciliation
 {
   /// <summary>
   /// Generate test data
   /// </summary>
-  internal static class DataGenerator
+  internal static partial class DataGenerator
   {
-
-    public static Data Generate(int maxNumberOfProducts, int maxNumberOfOrders, int maxNumberOfCustomers, int maxQuantityPerOrder, int maxTotalQuantityPerProduct)
+    public static Data Generate(int maxNumberOfProducts, int maxNumberOfOrders, int maxNumberOfCustomers, int maxQuantityPerOrder, int maxTotalQuantityPerProduct, System.Action<string> progressChanged = null, [CallerMemberName] string operation = "")
     {
+      Status status = new Status(operation, progressChanged, 100);
+      IList<CustomerOrder> customerOrders = null;
+      IList<FactoryShipment> factoryShipments = null;
+      Task.WaitAll(                
+                Task.Factory.StartNew(() => customerOrders = GenerateCustomerOrders(maxNumberOfProducts, maxNumberOfOrders, maxNumberOfCustomers, maxQuantityPerOrder, maxTotalQuantityPerProduct, status, progressChanged, operation)),
+                Task.Factory.StartNew(() => factoryShipments = GenerateFactoryShipments(maxNumberOfProducts, maxTotalQuantityPerProduct, status, progressChanged, operation))
+                );
+      status.Report();
       Data data = new Data
       {
-        CustomerOrders = GenerateCustomerOrders(maxNumberOfProducts, maxNumberOfOrders, maxNumberOfCustomers, maxQuantityPerOrder, maxTotalQuantityPerProduct),
-        FactoryShipments = GenerateFactoryShipments(maxNumberOfProducts, maxTotalQuantityPerProduct)
+        CustomerOrders = customerOrders,
+        FactoryShipments = factoryShipments
       };
       return data;
     }
 
-    private static IList<FactoryShipment> GenerateFactoryShipments(int maxNumberOfProducts, int maxTotalQuantityPerProduct)
+    private static IList<FactoryShipment> GenerateFactoryShipments(int maxNumberOfProducts, int maxTotalQuantityPerProduct, Status status, System.Action<string> progressChanged, string operation)
     {
       List<FactoryShipment> records = new List<FactoryShipment>();
       Random random = new Random(DateTime.Now.Millisecond);
@@ -40,13 +49,15 @@ namespace ShipmentReconciliation
               Quantity = quantity
             });
             total += quantity;
+            status.FactoryShipmentCount++;
+            
           }
         }
       }
       return records;
     }
 
-    private static IList<CustomerOrder> GenerateCustomerOrders(int maxNumberOfProducts, int maxNumberOfOrders, int maxNumberOfCustomers, int maxQuantityPerOrder, int maxTotalQuantityPerProduct)
+    private static IList<CustomerOrder> GenerateCustomerOrders(int maxNumberOfProducts, int maxNumberOfOrders, int maxNumberOfCustomers, int maxQuantityPerOrder, int maxTotalQuantityPerProduct, Status status, System.Action<string> progressChanged, string operation)
     {
       List<CustomerOrder> records = new List<CustomerOrder>();
       Random random = new Random(DateTime.Now.Millisecond);
@@ -69,6 +80,8 @@ namespace ShipmentReconciliation
           ItemName = "Product" + iProduct,
           Quantity = quantity
         });
+        status.CustomerOrderCount++;
+        
       }
       return records;
     }

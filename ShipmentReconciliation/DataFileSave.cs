@@ -11,21 +11,34 @@ namespace ShipmentReconciliation
     public static void Save(Data data, string folderPath, string customerOrdersFileName = "CustomerOrders.csv", string factoryShipmentsFileName = "FactoryShipments.csv", Configuration customerOrdersCsvConfiguration = null, Configuration factoryShipmentsCsvConfiguration = null, System.Action<string> progressChanged = null, [CallerMemberName] string operation = "")
     {
       CheckFolder(folderPath, progressChanged, operation);
-      int cntFile = 0; int allFiles = 2;
-      WriteToFile(data.CustomerOrders, Path.Combine(folderPath, customerOrdersFileName), customerOrdersCsvConfiguration, progressChanged, progressOperation: $"{operation} {++cntFile}/{allFiles}");
-      WriteToFile(data.FactoryShipments, Path.Combine(folderPath, factoryShipmentsFileName), factoryShipmentsCsvConfiguration, progressChanged, progressOperation: $"{operation} {++cntFile}/{allFiles}");
+      SaveFiles(
+        data.CustomerOrders,
+        Path.Combine(folderPath, customerOrdersFileName),
+        data.FactoryShipments,
+        Path.Combine(folderPath, factoryShipmentsFileName),
+        customerOrdersCsvConfiguration,
+        factoryShipmentsCsvConfiguration,
+        progressChanged, operation
+        );
+    }
+    public static void Save(IList<CustomerOrder> customerOrders, string customerOrdersFilePath, IList<FactoryShipment> factoryShipments, string factoryShipmentsFilePath, Configuration customerOrdersCsvConfiguration = null, Configuration factoryShipmentsCsvConfiguration = null, System.Action<string> progressChanged = null, [CallerMemberName] string operation = "")
+    {
+      CheckFolder(Path.GetDirectoryName(customerOrdersFilePath), progressChanged, operation);
+      CheckFolder(Path.GetDirectoryName(factoryShipmentsFilePath), progressChanged, operation);
+      SaveFiles(customerOrders, customerOrdersFilePath, factoryShipments, factoryShipmentsFilePath, customerOrdersCsvConfiguration, factoryShipmentsCsvConfiguration, progressChanged, operation);
     }
 
-    public static void Save<T>(IEnumerable<T> records, string folderPath, string fileName, Configuration csvConfiguration = null, System.Action<string> progressChanged = null, int cntFile = 1, int allFiles = 1, [CallerMemberName] string operation = "")
+    private static void SaveFiles(IList<CustomerOrder> customerOrders, string customerOrdersFilePath, IList<FactoryShipment> factoryShipments, string factoryShipmentsFilePath, Configuration customerOrdersCsvConfiguration, Configuration factoryShipmentsCsvConfiguration, System.Action<string> progressChanged, string operation)
     {
-      CheckFolder(folderPath, progressChanged, operation);
-      WriteToFile(records, Path.Combine(folderPath, fileName), csvConfiguration, progressChanged, operation);
-    }
-
-    public static void Save<T>(IEnumerable<T> records, string filePath, Configuration csvConfiguration = null, System.Action<string> progressChanged = null, int cntFile = 1, int allFiles = 1, [CallerMemberName] string operation = "")
-    {
-      CheckFolder(Path.GetDirectoryName(filePath), progressChanged, operation);
-      WriteToFile(records, filePath, csvConfiguration, progressChanged, operation);
+      Status status = new Status(operation, progressChanged, 100);
+      //!CsvWriter is NOT threadSafe!!!
+      //Task.WaitAll(
+      //    Task.Factory.StartNew(() => WriteToFile(customerOrders, customerOrdersFilePath, customerOrdersCsvConfiguration, (count, message) => { status.CustomerOrderMessage = message; status.CustomerOrderCount = count; })),
+      //    Task.Factory.StartNew(() => WriteToFile(factoryShipments, factoryShipmentsFilePath, factoryShipmentsCsvConfiguration, (count, message) => { status.FactoryShipmentMessage = message; status.FactoryShipmentCount = count; }))
+      //    );
+      WriteToFile(customerOrders, customerOrdersFilePath, customerOrdersCsvConfiguration, (count, message) => { status.CustomerOrderMessage = message; status.CustomerOrderCount = count; });
+      WriteToFile(factoryShipments, factoryShipmentsFilePath, factoryShipmentsCsvConfiguration, (count, message) => { status.FactoryShipmentMessage = message; status.FactoryShipmentCount = count; });
+      status.Report();
     }
 
     private static void CheckFolder(string path, System.Action<string> progressChanged, string progressOperation)
@@ -35,10 +48,9 @@ namespace ShipmentReconciliation
       { Directory.CreateDirectory(path); }
     }
 
-    private static void WriteToFile<T>(IEnumerable<T> records, string path, Configuration csvConfiguration, System.Action<string> progressChanged, string progressOperation)
+    private static void WriteToFile<T>(IEnumerable<T> records, string path, Configuration csvConfiguration, System.Action<int, string> progressChanged)
     {
-      progressOperation = $"{progressOperation} {nameof(WriteToFile)} {Trim(path)}";
-      progressChanged?.Invoke(progressOperation);
+      //progressChanged?.Invoke(0, Trim(path));
       using (StreamWriter writer = new StreamWriter(path))
       using (CsvWriter csv = new CsvWriter(writer, csvConfiguration ?? DefaultConfiguration))
       {
@@ -47,8 +59,8 @@ namespace ShipmentReconciliation
         else
         {
           csv.WriteHeader<T>();
-          int cntRecords = ProcessRecords(records, (item) => { csv.NextRecord(); csv.WriteRecord(item); }, progressChanged, progressOperation);
-          progressChanged?.Invoke($"{progressOperation} {cntRecords} items.");
+          int cntRecords = ProcessRecords(records, (item) => { csv.NextRecord(); csv.WriteRecord(item); }, progressChanged, null);
+          //progressChanged?.Invoke(cntRecords, Trim(path));
         }
 
       }

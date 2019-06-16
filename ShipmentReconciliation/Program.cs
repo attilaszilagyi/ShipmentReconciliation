@@ -26,13 +26,13 @@ namespace ShipmentReconciliation
           if (Settings.Default.GenerateData)
           {
             GenerateData();
-            PreProcessData();
+            ValidateData();
             SaveData();
           }
           if (Settings.Default.ProcessData)
           {
             LoadData();
-            PreProcessData();
+            ValidateData();
             ProcessData();
           }
         }
@@ -101,7 +101,7 @@ namespace ShipmentReconciliation
       { return; }
       IOrderedEnumerable<SettingsProperty> settings = Settings.Default.Properties.OfType<SettingsProperty>().OrderBy(s => s.Name);
 
-      Console.WriteLine("Settings:");
+      Console.WriteLine($"{nameof(DisplaySettings)}");
       foreach (SettingsProperty setting in settings)
       {
         Console.WriteLine($"\t{setting.Name}:\t{Settings.Default.PropertyValues[setting.Name].PropertyValue:N0}");
@@ -112,6 +112,12 @@ namespace ShipmentReconciliation
     {
       if (Settings.Default.GenerateData || Settings.Default.ProcessData)
       {
+          string operation = string.Empty;
+          if (Settings.Default.GenerateData)
+            operation += $"{nameof(GenerateData)} ";
+          if (Settings.Default.ProcessData)
+            operation += $"{nameof(ProcessData)} ";
+          Console.WriteLine("Operation: " + operation);
         if (!Settings.Default.AutoStart)
         {
           Console.Write("Press 'Y' to continue, any other key to abort... ");
@@ -127,7 +133,7 @@ namespace ShipmentReconciliation
       }
       else
       {
-        Console.WriteLine("No operation selected to run.");
+        Console.WriteLine($"No operation ({nameof(GenerateData)} or {nameof(ProcessData)}) selected to run.");
         return false;
       }
       return true;
@@ -138,46 +144,48 @@ namespace ShipmentReconciliation
     /// </summary>
     private static void GenerateData()
     {
-      Console.Write("Generating data...");
+      Console.Write($"{nameof(GenerateData)} ... ");
       _data = DataGenerator.Generate(
           maxNumberOfProducts: Settings.Default.GenerateDataMaxNumberOfProducts,
           maxNumberOfOrders: Settings.Default.GenerateDataMaxNumberOfOrders,
           maxNumberOfCustomers: Settings.Default.GenerateDataMaxNumberOfCustomers,
           maxQuantityPerOrder: Settings.Default.GenerateDataMaxQuantityPerOrder,
-          maxTotalQuantityPerProduct: Settings.Default.GenerateDataMaxQuantityPerProduct);
-      Console.WriteLine("\rGenerating data finished. ");
+          maxTotalQuantityPerProduct: Settings.Default.GenerateDataMaxQuantityPerProduct,
+          progressChanged: progressChanged);
+      Console.WriteLine();
     }
 
     private static void SaveData()
     {
-      Console.Write("Saving data... ");
-      long id = DateTime.Now.Ticks;
+      Console.Write($"{nameof(SaveData)} ... ");
+
       if (!string.IsNullOrEmpty(Settings.Default.FolderPath))
       {
-        string folderPath = string.Format(Settings.Default.FolderPath, id);
-        Console.Write($"\rSaving data... {folderPath} ");
+        var subFolderID = DateTime.Now.Ticks.ToString();
+        string folderPath = System.IO.Path.Combine(Settings.Default.FolderPath, subFolderID);
+        Console.Write(folderPath);
         DataFile.Save(_data, folderPath,
             customerOrdersCsvConfiguration: _csvConfiguration,
             factoryShipmentsCsvConfiguration: _csvConfiguration,
             progressChanged: progressChanged);
-        Console.WriteLine($"\r\nSaving data finished. {folderPath} ");
+        
       }
       else if (!string.IsNullOrEmpty(Settings.Default.FilePathCustomerOrders) && !string.IsNullOrEmpty(Settings.Default.FilePathFactoryShipment))
       {
-        Console.Write("\rSaving Customer Orders... ");
-        DataFile.Save(_data.CustomerOrders, Settings.Default.FilePathCustomerOrders, _csvConfiguration,
+        DataFile.Save(_data.CustomerOrders, 
+          Settings.Default.FilePathCustomerOrders,
+          _data.FactoryShipments,
+          Settings.Default.FilePathFactoryShipment,
+            customerOrdersCsvConfiguration: _csvConfiguration,
+            factoryShipmentsCsvConfiguration: _csvConfiguration,
             progressChanged: progressChanged);
-        Console.WriteLine("Saving Customer Orders finished.");
-
-        Console.Write("\rSaving Factory Shipments... ");
-        DataFile.Save(_data.FactoryShipments, Settings.Default.FilePathFactoryShipment, _csvConfiguration,
-            progressChanged: progressChanged);
-        Console.Write("\rSaving Factory Shipments finished.");
-        Console.WriteLine($"\rSaving data finished. ");
+        
+        
       }
       else
-      { Console.WriteLine("\rNo saving path provided."); }
-      
+      { Console.Write("No saving path provided."); }
+
+        Console.WriteLine();
     }
 
     private static void ProcessData()
@@ -189,7 +197,7 @@ namespace ShipmentReconciliation
     {
       if (_data == null)
       {
-        Console.Write("Loading data... ");
+        Console.Write($"{nameof(LoadData)} ... ");
         if (!string.IsNullOrEmpty(Settings.Default.FolderPath))
         {
           _data = DataFile.Load(
@@ -218,20 +226,20 @@ namespace ShipmentReconciliation
       }
     }
 
-    private static void PreProcessData()
+    private static void ValidateData()
     {
       if (_dataWrapper == null)
       {
-        Console.Write("Pre-processing data... ");
+        Console.Write($"{nameof(ValidateData)} ");
         _dataWrapper = new DataWrapper(_data);
-        Console.Write("\rPre-processing data finished. ");
+        
         if (Settings.Default.Verbose)
         {
           DisplaySummary(_dataWrapper);
         }
         else
         {
-          Console.WriteLine();
+          Console.WriteLine($"Surplus: {_dataWrapper.TotalSurplus:N0} items of {_dataWrapper.CountProductSurplus:N0} products, Deficit: {_dataWrapper.TotalDeficit:N0} items of {_dataWrapper.CountProductDeficit:N0} products.");
         }
       }
     }
@@ -239,10 +247,10 @@ namespace ShipmentReconciliation
     private static void DisplaySummary(DataWrapper dataWrapper, string title = "Summary:", string indent = "\t")
     {
       Console.WriteLine($"{title}");
-      Console.WriteLine($"{indent}Factory Shipment: {dataWrapper.CountItemFactoryShipment:N0} items in {dataWrapper.CountRecordFactoryShipment:N0} shipments of {dataWrapper.CountProductFactoryShipment:N0} products.");
-      Console.WriteLine($"{indent}Customer Orders: {dataWrapper.CountItemCustomerOrders:N0} items in {dataWrapper.CountRecordCustomerOrders:N0} orders of {dataWrapper.CountProductCustomerOrders:N0} products.");
-      Console.WriteLine($"{indent}Total Deficit: {dataWrapper.TotalDeficit:N0} items of {dataWrapper.CountProductDeficit:N0} products.");
-      Console.WriteLine($"{indent}Total Surplus: {dataWrapper.TotalSurplus:N0} items of {dataWrapper.CountProductSurplus:N0} products.");
+      Console.WriteLine($"{indent}CustomerOrder: {dataWrapper.CountItemCustomerOrders:N0} items in {dataWrapper.CountRecordCustomerOrders:N0} orders of {dataWrapper.CountProductCustomerOrders:N0} products.");
+      Console.WriteLine($"{indent}FactoryShipment: {dataWrapper.CountItemFactoryShipment:N0} items in {dataWrapper.CountRecordFactoryShipment:N0} shipments of {dataWrapper.CountProductFactoryShipment:N0} products.");
+      Console.WriteLine($"{indent}TotalSurplus: {dataWrapper.TotalSurplus:N0} items of {dataWrapper.CountProductSurplus:N0} products.");
+      Console.WriteLine($"{indent}TotalDeficit: {dataWrapper.TotalDeficit:N0} items of {dataWrapper.CountProductDeficit:N0} products.");
 
     }
 

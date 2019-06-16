@@ -18,7 +18,7 @@ namespace ShipmentReconciliation
         CustomerOrders = customerOrders,
         FactoryShipments = factoryShipments
       };
-      progressChanged?.Invoke($"{operation}. CustomerOrder: {cntRecordCustomerOrders:N0} records in {cntFileCustomerOrders:N0} files. FactoryShipment: {cntRecordFactoryShipments:N0} records in {cntFileFactoryShipments:N0} files.");
+      progressChanged?.Invoke($"{operation} CustomerOrder: {cntRecordCustomerOrders:N0} records in {cntFileCustomerOrders:N0} files, FactoryShipment: {cntRecordFactoryShipments:N0} records in {cntFileFactoryShipments:N0} files.");
       return inputData;
     }
 
@@ -33,7 +33,7 @@ namespace ShipmentReconciliation
         CustomerOrders = customerOrders,
         FactoryShipments = factoryShipments
       };
-      progressChanged?.Invoke($"{operation}. CustomerOrder: {cntRecordCustomerOrders:N0} records. FactoryShipment: {cntRecordFactoryShipments:N0} records.");
+      progressChanged?.Invoke($"{operation}. CustomerOrder: {cntRecordCustomerOrders:N0} records, FactoryShipment: {cntRecordFactoryShipments:N0} records.");
       return inputData;
     }
 
