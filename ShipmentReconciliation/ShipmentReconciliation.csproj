@@ -50,10 +50,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CustomerOrder.cs" />
+    <Compile Include="DataFile.cs" />
     <Compile Include="DataGenerator.cs" />
-    <Compile Include="DataLoader.cs" />
+    <Compile Include="DataFileLoad.cs" />
     <Compile Include="DataWrapper.cs" />
-    <Compile Include="DataSaver.cs" />
+    <Compile Include="DataFileSave.cs" />
     <Compile Include="FactoryShipment.cs" />
     <Compile Include="Data.cs" />
     <Compile Include="Program.cs" />

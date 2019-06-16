@@ -9,9 +9,11 @@ namespace ShipmentReconciliation
   {
     private static Data _data;
     private static DataWrapper _dataWrapper;
+    private static CsvHelper.Configuration.Configuration _csvConfiguration;
 
     private static void Main(string[] args)
     {
+
       DisplayTitle();
       try
       {
@@ -64,8 +66,20 @@ namespace ShipmentReconciliation
         }
         else if (parts.Length == 2)
         {
-          Settings.Default[settingName] = Convert.ChangeType(parts[1], setting.PropertyType);
+          string settingValue = parts[1].TrimStart('"').TrimEnd('"');
+          Settings.Default[settingName] = Convert.ChangeType(settingValue, setting.PropertyType);
         }
+      }
+
+      _csvConfiguration = !string.IsNullOrEmpty(Settings.Default.CsvConfigurationCulture) ? new CsvHelper.Configuration.Configuration(new System.Globalization.CultureInfo(Settings.Default.CsvConfigurationCulture)) : new CsvHelper.Configuration.Configuration();
+      if (!string.IsNullOrEmpty(Settings.Default.CsvConfigurationDelimiter))
+      {
+        _csvConfiguration.Delimiter = Settings.Default.CsvConfigurationDelimiter;
+      }
+
+      if (!string.IsNullOrEmpty(Settings.Default.CsvConfigurationEncoding))
+      {
+        _csvConfiguration.Encoding = System.Text.Encoding.GetEncoding(Settings.Default.CsvConfigurationEncoding);
       }
     }
 
@@ -114,30 +128,38 @@ namespace ShipmentReconciliation
           maxQuantityPerOrder: Settings.Default.GenerateDataMaxQuantityPerOrder,
           maxTotalQuantityPerProduct: Settings.Default.GenerateDataMaxQuantityPerProduct);
       Console.WriteLine("Generating data finished.");
-
-      _dataWrapper = new DataWrapper(_data);
-      DisplaySummary(_dataWrapper);
+      if (Settings.Default.Verbose)
+      {
+        _dataWrapper = new DataWrapper(_data);
+        DisplaySummary(_dataWrapper);
+      }
       SaveData();
     }
 
     private static void SaveData()
     {
+      long id = DateTime.Now.Ticks;
       if (!string.IsNullOrEmpty(Settings.Default.FolderPath))
       {
         Console.WriteLine("Saving data...");
-        DataSaver.SaveToFolder(_data, Settings.Default.FolderPath);
+        string folderPath = string.Format(Settings.Default.FolderPath, id);
+        Console.WriteLine($"\t{folderPath}");
+        DataFile.Save(_data, folderPath,
+            customerOrdersCsvConfiguration: _csvConfiguration,
+            factoryShipmentsCsvConfiguration: _csvConfiguration);
         Console.WriteLine("Saving data finished.");
       }
       else if (!string.IsNullOrEmpty(Settings.Default.FilePathCustomerOrders) && !string.IsNullOrEmpty(Settings.Default.FilePathFactoryShipment))
       {
         Console.WriteLine("Saving Customer Orders...");
-        DataSaver.SaveToFile(_data.CustomerOrders, Settings.Default.FilePathCustomerOrders);
+        DataFile.Save(_data.CustomerOrders, Settings.Default.FilePathCustomerOrders, _csvConfiguration);
         Console.WriteLine("Saving Customer Orders finished.");
 
         Console.WriteLine("Saving Factory Shipments...");
-        DataSaver.SaveToFile(_data.FactoryShipments, Settings.Default.FilePathFactoryShipment);
+        DataFile.Save(_data.FactoryShipments, Settings.Default.FilePathFactoryShipment, _csvConfiguration);
         Console.WriteLine("Saving Factory Shipments finished.");
       }
+      else { Console.WriteLine("No saving path provided."); }
     }
 
     private static void ProcessData()
@@ -149,27 +171,40 @@ namespace ShipmentReconciliation
     {
       if (_data == null)
       {
+        Console.WriteLine("Loading data...");
         if (!string.IsNullOrEmpty(Settings.Default.FolderPath))
         {
-          Console.WriteLine("Loading data...");
-          _data = DataLoader.LoadFolder(Settings.Default.FolderPath);
-          Console.WriteLine("Loading data finished.");
+          _data = DataFile.Load(
+            Settings.Default.FolderPath,
+            Settings.Default.FolderSearchSubs ? System.IO.SearchOption.AllDirectories : System.IO.SearchOption.TopDirectoryOnly,
+            Settings.Default.FolderSearchPatternCustomerOrders,
+            Settings.Default.FolderSearchPatternFactoryShipment,
+            customerOrdersCsvConfiguration: _csvConfiguration,
+            factoryShipmentsCsvConfiguration: _csvConfiguration);
         }
         else if (!string.IsNullOrEmpty(Settings.Default.FilePathCustomerOrders) && !string.IsNullOrEmpty(Settings.Default.FilePathFactoryShipment))
         {
-          Console.WriteLine("Loading Customer Orders...");
-          _data = DataLoader.LoadFiles(Settings.Default.FilePathCustomerOrders, Settings.Default.FilePathFactoryShipment);
-          Console.WriteLine("Loading Customer Orders finished.");
-
+          _data = DataFile.Load(
+            Settings.Default.FilePathCustomerOrders,
+            Settings.Default.FilePathFactoryShipment,
+            customerOrdersCsvConfiguration: _csvConfiguration,
+            factoryShipmentsCsvConfiguration: _csvConfiguration);
         }
         else
         {
           throw new ShipmentReconciliationException("Missing source path.");
         }
+        Console.WriteLine("Loading data finished.");
       }
       if (_dataWrapper == null)
       {
+        Console.WriteLine("Pre-processing data...");
         _dataWrapper = new DataWrapper(_data);
+        Console.WriteLine("Pre-processing data finished.");
+        if (Settings.Default.Verbose)
+        {
+          DisplaySummary(_dataWrapper);
+        }
       }
     }
 

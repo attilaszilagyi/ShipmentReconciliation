@@ -214,5 +214,41 @@ namespace ShipmentReconciliation.Properties {
                 this["GenerateDataMaxQuantityPerProduct"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(";")]
+        public string CsvConfigurationDelimiter {
+            get {
+                return ((string)(this["CsvConfigurationDelimiter"]));
+            }
+            set {
+                this["CsvConfigurationDelimiter"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("UTF-8")]
+        public string CsvConfigurationEncoding {
+            get {
+                return ((string)(this["CsvConfigurationEncoding"]));
+            }
+            set {
+                this["CsvConfigurationEncoding"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("en-GB")]
+        public string CsvConfigurationCulture {
+            get {
+                return ((string)(this["CsvConfigurationCulture"]));
+            }
+            set {
+                this["CsvConfigurationCulture"] = value;
+            }
+        }
     }
 }

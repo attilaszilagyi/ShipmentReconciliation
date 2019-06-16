@@ -29,15 +29,18 @@ namespace ShipmentReconciliation
         string product = "Product" + iProduct;
         int maxQuantity = (int)(random.NextDouble() * maxTotalQuantityPerProduct);
         var total = 0;
-        while (total< maxQuantity)
+        if (maxQuantity > 0)
         {
-          int quantity = (int)(random.NextDouble() * maxQuantity);
-          records.Add(new FactoryShipment()
+          while (total < maxQuantity)
           {
-            ItemName = product,
-            Quantity = quantity
-          });
-          total += quantity;
+            int quantity = Math.Max((int)(random.NextDouble() * maxQuantity), 1);
+            records.Add(new FactoryShipment()
+            {
+              ItemName = product,
+              Quantity = quantity
+            });
+            total += quantity;
+          }
         }
       }
       return records;

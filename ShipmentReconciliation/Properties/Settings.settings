@@ -50,5 +50,14 @@
     <Setting Name="GenerateDataMaxQuantityPerProduct" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">10000</Value>
     </Setting>
+    <Setting Name="CsvConfigurationDelimiter" Type="System.String" Scope="User">
+      <Value Profile="(Default)">;</Value>
+    </Setting>
+    <Setting Name="CsvConfigurationEncoding" Type="System.String" Scope="User">
+      <Value Profile="(Default)">UTF-8</Value>
+    </Setting>
+    <Setting Name="CsvConfigurationCulture" Type="System.String" Scope="User">
+      <Value Profile="(Default)">en-GB</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
