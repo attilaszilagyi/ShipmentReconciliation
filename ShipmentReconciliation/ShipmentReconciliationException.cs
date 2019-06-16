@@ -1,5 +1,8 @@
 ﻿namespace ShipmentReconciliation
 {
+  /// <summary>
+  /// Application exception
+  /// </summary>
   internal class ShipmentReconciliationException : System.Exception
   {
     public ShipmentReconciliationException():base()

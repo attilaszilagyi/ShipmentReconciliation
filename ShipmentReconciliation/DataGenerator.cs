@@ -10,6 +10,17 @@ namespace ShipmentReconciliation
   /// </summary>
   internal static partial class DataGenerator
   {
+    /// <summary>
+    /// Generates test data records with random item names, customer ids and quantities.
+    /// </summary>
+    /// <param name="maxNumberOfProducts"></param>
+    /// <param name="maxNumberOfOrders"></param>
+    /// <param name="maxNumberOfCustomers"></param>
+    /// <param name="maxQuantityPerOrder"></param>
+    /// <param name="maxTotalQuantityPerProduct"></param>
+    /// <param name="progressChanged">Callback for progress report</param>
+    /// <param name="operation">Title text for progress report</param>
+    /// <returns></returns>
     public static Data Generate(int maxNumberOfProducts, int maxNumberOfOrders, int maxNumberOfCustomers, int maxQuantityPerOrder, int maxTotalQuantityPerProduct, System.Action<string> progressChanged = null, [CallerMemberName] string operation = "")
     {
       Status status = new Status(operation, progressChanged, 100);
