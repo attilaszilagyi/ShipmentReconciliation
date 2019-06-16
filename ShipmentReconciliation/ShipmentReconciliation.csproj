@@ -65,7 +65,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="ShipmentReconciliationException.cs" />
-    <Compile Include="Status.cs" />
+    <Compile Include="ProgressStatus.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

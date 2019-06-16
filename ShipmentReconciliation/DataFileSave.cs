@@ -42,7 +42,7 @@ namespace ShipmentReconciliation
 
     private static void SaveFiles(IList<CustomerOrder> customerOrders, string customerOrdersFilePath, IList<FactoryShipment> factoryShipments, string factoryShipmentsFilePath, Configuration customerOrdersCsvConfiguration, Configuration factoryShipmentsCsvConfiguration, System.Action<string> progressChanged, string operation)
     {
-      Status status = new Status(operation, progressChanged, 100);
+      ProgressStatus status = new ProgressStatus(operation, progressChanged, 100);
       //!CsvWriter is NOT threadSafe!!!
       //Task.WaitAll(
       //    Task.Factory.StartNew(() => WriteToFile(customerOrders, customerOrdersFilePath, customerOrdersCsvConfiguration, (count, message) => { status.CustomerOrderMessage = message; status.CustomerOrderCount = count; })),

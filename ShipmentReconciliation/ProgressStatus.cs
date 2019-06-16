@@ -6,7 +6,7 @@ namespace ShipmentReconciliation
   /// Helper class for progress report of multi-threaded tasks of processing  
   /// Customer Order records and Factory Shipment records in parallel.
   /// </summary>
-  internal class Status
+  internal class ProgressStatus
   {
     /// <summary>
     /// 
@@ -14,7 +14,7 @@ namespace ShipmentReconciliation
     /// <param name="operation">Title text for progress report</param>
     /// <param name="progressChanged">Callback for progress report</param>
     /// <param name="reportPerCount">Aggregate this number of results before calling back</param>
-    public Status(string operation, Action<string> progressChanged, int reportPerCount)
+    public ProgressStatus(string operation, Action<string> progressChanged, int reportPerCount)
     {
       Operation = operation;
       ProgressChanged = progressChanged;

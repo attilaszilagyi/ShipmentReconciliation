@@ -23,7 +23,7 @@ namespace ShipmentReconciliation
     /// <returns></returns>
     public static Data Generate(int maxNumberOfProducts, int maxNumberOfOrders, int maxNumberOfCustomers, int maxQuantityPerOrder, int maxTotalQuantityPerProduct, System.Action<string> progressChanged = null, [CallerMemberName] string operation = "")
     {
-      Status status = new Status(operation, progressChanged, 100);
+      ProgressStatus status = new ProgressStatus(operation, progressChanged, 100);
       IList<CustomerOrder> customerOrders = null;
       IList<FactoryShipment> factoryShipments = null;
       Task.WaitAll(                
@@ -39,7 +39,7 @@ namespace ShipmentReconciliation
       return data;
     }
 
-    private static IList<FactoryShipment> GenerateFactoryShipments(int maxNumberOfProducts, int maxTotalQuantityPerProduct, Status status, System.Action<string> progressChanged, string operation)
+    private static IList<FactoryShipment> GenerateFactoryShipments(int maxNumberOfProducts, int maxTotalQuantityPerProduct, ProgressStatus status, System.Action<string> progressChanged, string operation)
     {
       List<FactoryShipment> records = new List<FactoryShipment>();
       Random random = new Random(DateTime.Now.Millisecond);
@@ -68,7 +68,7 @@ namespace ShipmentReconciliation
       return records;
     }
 
-    private static IList<CustomerOrder> GenerateCustomerOrders(int maxNumberOfProducts, int maxNumberOfOrders, int maxNumberOfCustomers, int maxQuantityPerOrder, int maxTotalQuantityPerProduct, Status status, System.Action<string> progressChanged, string operation)
+    private static IList<CustomerOrder> GenerateCustomerOrders(int maxNumberOfProducts, int maxNumberOfOrders, int maxNumberOfCustomers, int maxQuantityPerOrder, int maxTotalQuantityPerProduct, ProgressStatus status, System.Action<string> progressChanged, string operation)
     {
       List<CustomerOrder> records = new List<CustomerOrder>();
       Random random = new Random(DateTime.Now.Millisecond);
