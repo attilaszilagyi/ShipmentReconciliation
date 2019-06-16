@@ -51,12 +51,18 @@ namespace ShipmentReconciliation
       }
     }
 
-
+    /// <summary>
+    /// Welcome message
+    /// </summary>
     private static void DisplayTitle()
     {
       Console.WriteLine(System.Reflection.Assembly.GetEntryAssembly().FullName);
     }
 
+    /// <summary>
+    /// Parse command line arguments as application settings
+    /// </summary>
+    /// <param name="args"></param>
     private static void LoadSettings(string[] args)
     {
       System.Collections.Generic.IEnumerable<SettingsProperty> settings = Settings.Default.Properties.Cast<SettingsProperty>();
@@ -95,6 +101,9 @@ namespace ShipmentReconciliation
       }
     }
 
+    /// <summary>
+    /// List all setting values to use for this run
+    /// </summary>
     private static void DisplaySettings()
     {
       if (!Settings.Default.Verbose)
@@ -108,6 +117,10 @@ namespace ShipmentReconciliation
       }
     }
 
+    /// <summary>
+    /// Prompt user to start the application
+    /// </summary>
+    /// <returns></returns>
     private static bool PromptStart()
     {
       if (Settings.Default.GenerateData || Settings.Default.ProcessData)
@@ -155,6 +168,9 @@ namespace ShipmentReconciliation
       Console.WriteLine();
     }
 
+    /// <summary>
+    /// Save test data to the file system
+    /// </summary>
     private static void SaveData()
     {
       Console.Write($"{nameof(SaveData)} ... ");
@@ -187,12 +203,13 @@ namespace ShipmentReconciliation
 
         Console.WriteLine();
     }
-
-    private static void ProcessData()
-    {
-
-    }
-
+    
+    /// <summary>
+    /// Read csv data from file system.
+    /// Either the folder path and the file search patterns must be provided, or 
+    /// the paths of a CustomerOrders and a FactoryShipments file. 
+    /// Paths may be absolute or relative. Search patterns may contain * char.
+    /// </summary>
     private static void LoadData()
     {
       if (_data == null)
@@ -226,6 +243,11 @@ namespace ShipmentReconciliation
       }
     }
 
+    /// <summary>
+    /// Pre-process customer order and factory shipment records, 
+    /// calculating total counts of records and sums of quantites, 
+    /// and total surplus and deficit per products.
+    /// </summary>
     private static void ValidateData()
     {
       if (_dataWrapper == null)
@@ -244,6 +266,20 @@ namespace ShipmentReconciliation
       }
     }
 
+    /// <summary>
+    /// Reconcile the customer orders with the factory shipment
+    /// </summary>
+    private static void ProcessData()
+    {
+
+    }
+
+    /// <summary>
+    /// List pre-processed data on screen.
+    /// </summary>
+    /// <param name="dataWrapper"></param>
+    /// <param name="title"></param>
+    /// <param name="indent"></param>
     private static void DisplaySummary(DataWrapper dataWrapper, string title = "Summary:", string indent = "\t")
     {
       Console.WriteLine($"{title}");
@@ -254,16 +290,27 @@ namespace ShipmentReconciliation
 
     }
 
+    /// <summary>
+    /// Handle application exceptions.
+    /// </summary>
+    /// <param name="ex"></param>
     private static void HandleWarning(ShipmentReconciliationException ex)
     {
       Console.WriteLine($"Warning: {ex.Message}");
     }
 
+    /// <summary>
+    /// Handle unexpected exceptions.
+    /// </summary>
+    /// <param name="ex"></param>
     private static void HandleError(Exception ex)
     {
       Console.WriteLine($"Error: {ex.Message}");
     }
-
+    
+    /// <summary>
+    /// Prompt user to exit application.
+    /// </summary>
     private static void PromptFinish()
     {
       if (Settings.Default.AutoExit)

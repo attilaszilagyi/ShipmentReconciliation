@@ -1,11 +1,16 @@
 ﻿using CsvHelper.Configuration;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 namespace ShipmentReconciliation
 {
+  /// <summary>
+  /// Csv file operations: Load from file system. Save to file system.
+  /// </summary>
   internal static partial class DataFile
   {
+    /// <summary>
+    /// Default Csv options.
+    /// </summary>
     public static Configuration DefaultConfiguration { get; set; } = new Configuration();
 
     private static string Trim(string text, int max = 50)
@@ -15,14 +20,14 @@ namespace ShipmentReconciliation
 
     private static int ProcessRecords<T>(IEnumerable<T> records, System.Action<T> process, System.Action<string> progressChanged, string operation, int reportPerCount = 100)
     {
-      int cntRecord = 0;      
+      int cntRecord = 0;
       foreach (T item in records)
       {
         process(item);
         cntRecord++;
         if (cntRecord % reportPerCount == 0)
         {
-          progressChanged($"{operation} {cntRecord:N0}");
+          progressChanged?.Invoke($"{operation} {cntRecord:N0}");
         }
       }
       return cntRecord;

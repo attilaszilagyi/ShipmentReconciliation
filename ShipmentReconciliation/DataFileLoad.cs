@@ -7,6 +7,18 @@ namespace ShipmentReconciliation
 {
   internal partial class DataFile
   {
+    /// <summary>
+    /// Reads csv files from source folder.
+    /// </summary>
+    /// <param name="folderPath">Root folder path. Relative or absolute.</param>
+    /// <param name="searchOption">Root only or subfolders too.</param>
+    /// <param name="customerOrdersSearchPattern">Customer Order file name pattern.</param>
+    /// <param name="factoryShipmentsSearchPattern">Factory Shipment file name pattern.</param>
+    /// <param name="customerOrdersCsvConfiguration">Csv configuration to parse Customer Order files</param>
+    /// <param name="factoryShipmentsCsvConfiguration">Csv configuration to parse Factory Shipment files</param>
+    /// <param name="progressChanged">Callback for progress report</param>
+    /// <param name="operation">Title text for progress report</param>
+    /// <returns></returns>
     public static Data Load(string folderPath, SearchOption searchOption = SearchOption.TopDirectoryOnly, string customerOrdersSearchPattern = "*CustomerOrder*.csv", string factoryShipmentsSearchPattern = "*FactoryShipment*.csv", Configuration customerOrdersCsvConfiguration = null, Configuration factoryShipmentsCsvConfiguration = null, System.Action<string> progressChanged = null, [CallerMemberName] string operation = "")
     {
       progressChanged?.Invoke($"{operation} CustomerOrders...");
@@ -22,6 +34,16 @@ namespace ShipmentReconciliation
       return inputData;
     }
 
+    /// <summary>
+    /// Reads one Customer Order csv file and one Factory Shipment csv file.
+    /// </summary>
+    /// <param name="customerOrdersFilePath">File system path of the Customer Order csv file.</param>
+    /// <param name="factoryShipmentsFilePath">File system path of the Factory Shipment csv file.</param>
+    /// <param name="customerOrdersCsvConfiguration">Csv configuration to parse Customer Order files</param>
+    /// <param name="factoryShipmentsCsvConfiguration">Csv configuration to parse Factory Shipment files</param>
+    /// <param name="progressChanged">Callback for progress report</param>
+    /// <param name="operation">Title text for progress report</param>
+    /// <returns></returns>
     public static Data Load(string customerOrdersFilePath, string factoryShipmentsFilePath, Configuration customerOrdersCsvConfiguration = null, Configuration factoryShipmentsCsvConfiguration = null, System.Action<string> progressChanged = null, [CallerMemberName] string operation = "")
     {
       progressChanged?.Invoke($"{operation} CustomerOrders...");
