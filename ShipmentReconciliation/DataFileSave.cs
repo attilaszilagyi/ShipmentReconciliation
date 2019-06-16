@@ -8,6 +8,17 @@ namespace ShipmentReconciliation
 {
   internal partial class DataFile
   {
+    /// <summary>
+    /// Saves Customer Order and Factory Shipment records to csv files in the provided file system folder. 
+    /// </summary>
+    /// <param name="data">Records to save</param>
+    /// <param name="folderPath">Destination folder path. Relative or absolute.</param>
+    /// <param name="customerOrdersFileName">File name of the Customer Orders csv file.</param>
+    /// <param name="factoryShipmentsFileName">File name ot the Factory Shipment csv file.</param>
+    /// <param name="customerOrdersCsvConfiguration">Csv options of the Customer Orders csv file.</param>
+    /// <param name="factoryShipmentsCsvConfiguration">Csv options of the Factory Shipment csv file.</param>
+    /// <param name="progressChanged">Callback to report progress</param>
+    /// <param name="operation">Progress report title text</param>
     public static void Save(Data data, string folderPath, string customerOrdersFileName = "CustomerOrders.csv", string factoryShipmentsFileName = "FactoryShipments.csv", Configuration customerOrdersCsvConfiguration = null, Configuration factoryShipmentsCsvConfiguration = null, System.Action<string> progressChanged = null, [CallerMemberName] string operation = "")
     {
       CheckFolder(folderPath, progressChanged, operation);
@@ -21,6 +32,7 @@ namespace ShipmentReconciliation
         progressChanged, operation
         );
     }
+
     public static void Save(IList<CustomerOrder> customerOrders, string customerOrdersFilePath, IList<FactoryShipment> factoryShipments, string factoryShipmentsFilePath, Configuration customerOrdersCsvConfiguration = null, Configuration factoryShipmentsCsvConfiguration = null, System.Action<string> progressChanged = null, [CallerMemberName] string operation = "")
     {
       CheckFolder(Path.GetDirectoryName(customerOrdersFilePath), progressChanged, operation);

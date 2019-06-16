@@ -125,12 +125,18 @@ namespace ShipmentReconciliation
     {
       if (Settings.Default.GenerateData || Settings.Default.ProcessData)
       {
-          string operation = string.Empty;
-          if (Settings.Default.GenerateData)
-            operation += $"{nameof(GenerateData)} ";
-          if (Settings.Default.ProcessData)
-            operation += $"{nameof(ProcessData)} ";
-          Console.WriteLine("Operation: " + operation);
+        string operation = string.Empty;
+        if (Settings.Default.GenerateData)
+        {
+          operation += $"{nameof(GenerateData)} ";
+        }
+
+        if (Settings.Default.ProcessData)
+        {
+          operation += $"{nameof(ProcessData)} ";
+        }
+
+        Console.WriteLine("Operation: " + operation);
         if (!Settings.Default.AutoStart)
         {
           Console.Write("Press 'Y' to continue, any other key to abort... ");
@@ -169,41 +175,46 @@ namespace ShipmentReconciliation
     }
 
     /// <summary>
-    /// Save test data to the file system
+    /// Saves test data to the file system.
     /// </summary>
+    /// <remarks>Creates a uniquely named subfolder in the target directory.</remarks>
     private static void SaveData()
     {
       Console.Write($"{nameof(SaveData)} ... ");
-
+      //Destination folder path provided
       if (!string.IsNullOrEmpty(Settings.Default.FolderPath))
       {
-        var subFolderID = DateTime.Now.Ticks.ToString();
+        string subFolderID = DateTime.Now.Ticks.ToString();
         string folderPath = System.IO.Path.Combine(Settings.Default.FolderPath, subFolderID);
         Console.Write(folderPath);
         DataFile.Save(_data, folderPath,
             customerOrdersCsvConfiguration: _csvConfiguration,
             factoryShipmentsCsvConfiguration: _csvConfiguration,
             progressChanged: progressChanged);
-        
+
       }
+      //Destination file names are provided
       else if (!string.IsNullOrEmpty(Settings.Default.FilePathCustomerOrders) && !string.IsNullOrEmpty(Settings.Default.FilePathFactoryShipment))
       {
-        DataFile.Save(_data.CustomerOrders, 
+        DataFile.Save(_data.CustomerOrders,
           Settings.Default.FilePathCustomerOrders,
           _data.FactoryShipments,
           Settings.Default.FilePathFactoryShipment,
             customerOrdersCsvConfiguration: _csvConfiguration,
             factoryShipmentsCsvConfiguration: _csvConfiguration,
             progressChanged: progressChanged);
-        
-        
-      }
-      else
-      { Console.Write("No saving path provided."); }
 
-        Console.WriteLine();
+
+      }
+      //no destination path provided (=> we don't save data to file system)
+      else
+      {
+        Console.Write("No saving path provided.");
+      }
+
+      Console.WriteLine();
     }
-    
+
     /// <summary>
     /// Read csv data from file system.
     /// Either the folder path and the file search patterns must be provided, or 
@@ -254,7 +265,7 @@ namespace ShipmentReconciliation
       {
         Console.Write($"{nameof(ValidateData)} ");
         _dataWrapper = new DataWrapper(_data);
-        
+
         if (Settings.Default.Verbose)
         {
           DisplaySummary(_dataWrapper);
@@ -307,7 +318,7 @@ namespace ShipmentReconciliation
     {
       Console.WriteLine($"Error: {ex.Message}");
     }
-    
+
     /// <summary>
     /// Prompt user to exit application.
     /// </summary>
