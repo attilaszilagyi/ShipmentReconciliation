@@ -21,7 +21,7 @@ namespace ShipmentReconciliation
     /// <returns></returns>
     public static Data Load(string folderPath, SearchOption searchOption = SearchOption.TopDirectoryOnly, string customerOrdersSearchPattern = "*CustomerOrder*.csv", string factoryShipmentsSearchPattern = "*FactoryShipment*.csv", Configuration customerOrdersCsvConfiguration = null, Configuration factoryShipmentsCsvConfiguration = null, System.Action<string> progressChanged = null, [CallerMemberName] string operation = "")
     {
-      CheckParams(customerOrdersSearchPattern, factoryShipmentsSearchPattern);
+      CheckFolderSearchPatterns(customerOrdersSearchPattern, factoryShipmentsSearchPattern);
       progressChanged?.Invoke($"{operation} CustomerOrders...");
       IList<CustomerOrder> customerOrders = LoadFromFolder<CustomerOrder>(folderPath, customerOrdersSearchPattern, searchOption, customerOrdersCsvConfiguration, progressChanged, operation, out int cntFileCustomerOrders, out int cntRecordCustomerOrders);
       progressChanged?.Invoke($"{operation} FactoryShipments...");
@@ -34,7 +34,7 @@ namespace ShipmentReconciliation
       progressChanged?.Invoke($"{operation} CustomerOrder: {cntRecordCustomerOrders:N0} records in {cntFileCustomerOrders:N0} files, FactoryShipment: {cntRecordFactoryShipments:N0} records in {cntFileFactoryShipments:N0} files.");
       return inputData;
     }
-    
+
     /// <summary>
     /// Reads one Customer Order csv file and one Factory Shipment csv file.
     /// </summary>
@@ -60,22 +60,39 @@ namespace ShipmentReconciliation
       return inputData;
     }
 
+    public static void CheckLoadParams(string folderPath, string filePathCustomerOrders, string filePathFactoryShipment, string customerOrdersSearchPattern, string factoryShipmentsSearchPattern)
+    {
+      CheckLoadPaths(folderPath, filePathCustomerOrders, filePathFactoryShipment);
+      if (!string.IsNullOrEmpty(folderPath) && (string.IsNullOrEmpty(filePathCustomerOrders) || string.IsNullOrEmpty(filePathFactoryShipment)))
+      {
+        CheckFolderSearchPatterns(customerOrdersSearchPattern, factoryShipmentsSearchPattern);
+      }
+    }
+    
 
-    private static void CheckParams(string customerOrdersSearchPattern, string factoryShipmentsSearchPattern)
+    private static void CheckLoadPaths(string folderPath, string filePathCustomerOrders, string filePathFactoryShipment)
+    {
+      if (string.IsNullOrEmpty(folderPath) && (string.IsNullOrEmpty(filePathCustomerOrders) || string.IsNullOrEmpty(filePathFactoryShipment)))      
+      {
+        throw new ShipmentReconciliationException("Missing source path.");
+      }
+    }
+
+    private static void CheckFolderSearchPatterns(string customerOrdersSearchPattern, string factoryShipmentsSearchPattern)
     {
       string errorMessage = string.Empty;
       if (string.IsNullOrEmpty(customerOrdersSearchPattern))
-      { errorMessage += "Customer Orders"; }
+      { errorMessage += "CustomerOrders"; }
       if (string.IsNullOrEmpty(factoryShipmentsSearchPattern))
       {
         if (errorMessage.Length > 0)
         {
           errorMessage += ", ";
         }
-        errorMessage += "Factory Shipment";
+        errorMessage += "FactoryShipment";
       }
       if (!string.IsNullOrEmpty(errorMessage))
-      { throw new ShipmentReconciliationException("Missing file search pattern: " + errorMessage); }
+      { throw new ShipmentReconciliationException("Missing file search pattern for: " + errorMessage); }
     }
 
     private static IList<T> LoadFromFolder<T>(string folderPath, string searchPattern, SearchOption searchOption, Configuration csvConfiguration, System.Action<string> progressChanged, string operation, out int cntFile, out int cntRecordsTotal)

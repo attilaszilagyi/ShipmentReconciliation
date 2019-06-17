@@ -9,12 +9,14 @@ namespace ShipmentReconciliation
 {
   public class Program
   {
-    private static Data _data;
-    private static DataWrapper _dataWrapper;
-    private static Result _result;
-
-    private static readonly System.Action<string> progressChanged = text => { Console.Write("\r" + text.PadRight(100)); };
-
+    /// <summary>
+    /// 1., Generates input data and stores to csv files and/or 
+    /// 2., Loads input data from csv files and 
+    /// 3., Processes input data, reconciliating shipments with orders 
+    /// (optimization with simple greedy algorithm and 01-knapsack problem solver minimizes surplus to store) and
+    /// 4., Lists result on screen and/or saves them to file.
+    /// </summary>
+    /// <param name="args"></param>
     private static void Main(string[] args)
     {
 
@@ -23,6 +25,7 @@ namespace ShipmentReconciliation
       {
         LoadSettings(args);
         DisplaySettings();
+        ValidateSettings();
         if (PromptStart())
         {
           if (Settings.Default.GenerateData)
@@ -54,6 +57,25 @@ namespace ShipmentReconciliation
         PromptFinish();
       }
     }
+
+    /// <summary>
+    /// Input data, randomly generated or loaded from file system. Customer Order and Factory Shipment records.
+    /// </summary>
+    private static Data _data;
+    /// <summary>
+    /// Pre-processed input data (sums, counts, balance) and helper functions to get input data records grouped and ordered. 
+    /// </summary>
+    private static DataWrapper _dataWrapper;
+    /// <summary>
+    /// Optimization process result. Orders to fulfill, products to store.
+    /// </summary>
+    private static Result _result;
+    /// <summary>
+    /// Helper anonym to display progress report messages on screen.
+    /// </summary>
+    private static readonly System.Action<string> progressChanged = text => { Console.Write("\r" + text.PadRight(100)); };
+
+    private static readonly string _subFolderID = DateTime.Now.Ticks.ToString();
 
     /// <summary>
     /// Welcome message
@@ -93,7 +115,7 @@ namespace ShipmentReconciliation
         }
       }
 
-      var csvConfiguration = !string.IsNullOrEmpty(Settings.Default.CsvConfigurationCulture) ? new CsvHelper.Configuration.Configuration(new System.Globalization.CultureInfo(Settings.Default.CsvConfigurationCulture)) : new CsvHelper.Configuration.Configuration();
+      CsvHelper.Configuration.Configuration csvConfiguration = !string.IsNullOrEmpty(Settings.Default.CsvConfigurationCulture) ? new CsvHelper.Configuration.Configuration(new System.Globalization.CultureInfo(Settings.Default.CsvConfigurationCulture)) : new CsvHelper.Configuration.Configuration();
       if (!string.IsNullOrEmpty(Settings.Default.CsvConfigurationDelimiter))
       {
         csvConfiguration.Delimiter = Settings.Default.CsvConfigurationDelimiter;
@@ -124,6 +146,18 @@ namespace ShipmentReconciliation
     }
 
     /// <summary>
+    /// Checks application setting / command line argument values.
+    /// </summary>
+    private static void ValidateSettings()
+    {
+      Console.Write($"{nameof(ValidateSettings)} ... ");
+
+      if (Settings.Default.ProcessData && !Settings.Default.GenerateData)
+      { DataFile.CheckLoadParams(Settings.Default.FolderPath, Settings.Default.FilePathCustomerOrders, Settings.Default.FilePathFactoryShipment, Settings.Default.FolderSearchPatternCustomerOrders, Settings.Default.FolderSearchPatternFactoryShipment); }
+      Console.Write($"\r{nameof(ValidateSettings)}     ");
+    }
+
+    /// <summary>
     /// Prompt user to start the application
     /// </summary>
     /// <returns></returns>
@@ -135,14 +169,37 @@ namespace ShipmentReconciliation
         if (Settings.Default.GenerateData)
         {
           operation += $"{nameof(GenerateData)} ";
+          if (!string.IsNullOrEmpty(Settings.Default.FolderPath))
+          {
+            Console.WriteLine($"Subfolder: {_subFolderID}");
+          }
+          else if (string.IsNullOrEmpty(Settings.Default.FilePathCustomerOrders) || string.IsNullOrEmpty(Settings.Default.FilePathFactoryShipment))
+          {//no destination path provided (=> we don't save data to file system)
+            Console.WriteLine("No file/folder paths provided to save generated data.");
+          }
         }
 
         if (Settings.Default.ProcessData)
         {
           operation += $"{nameof(ProcessData)} ";
+
+          if (string.IsNullOrEmpty(Settings.Default.ResultFileNameFulfill))
+          { Console.WriteLine("No filename provided where to save records of Customer Orders to fulfill."); }
+
+          if (!(Path.IsPathRooted(Settings.Default.ResultFileNameFulfill)) && string.IsNullOrEmpty(Settings.Default.ResultFolderPath) && string.IsNullOrEmpty(Settings.Default.FolderPath))
+          { Console.WriteLine("No file/folder path provided where to save records of Customer Orders to fulfill."); }
+
+          if (string.IsNullOrEmpty(Settings.Default.ResultFileNameStore))
+          { Console.WriteLine("No filename provided where to save records of surplus product quantities to store."); }
+
+          if (!(Path.IsPathRooted(Settings.Default.ResultFileNameStore)) && string.IsNullOrEmpty(Settings.Default.ResultFolderPath) && string.IsNullOrEmpty(Settings.Default.FolderPath))
+          { Console.WriteLine("No file/folder path provided where to save records of surplus product quantities to store."); }
+
         }
 
         Console.WriteLine("Operation: " + operation);
+
+
         if (!Settings.Default.AutoStart)
         {
           Console.Write("Press 'Y' to continue, any other key to abort... ");
@@ -190,8 +247,7 @@ namespace ShipmentReconciliation
       //Destination folder path provided
       if (!string.IsNullOrEmpty(Settings.Default.FolderPath))
       {
-        string subFolderID = DateTime.Now.Ticks.ToString();
-        string folderPath = System.IO.Path.Combine(Settings.Default.FolderPath, subFolderID);
+        string folderPath = System.IO.Path.Combine(Settings.Default.FolderPath, _subFolderID);
         Console.Write(folderPath);
         DataFile.Save(_data, folderPath,
             progressChanged: progressChanged);
@@ -212,7 +268,7 @@ namespace ShipmentReconciliation
       //no destination path provided (=> we don't save data to file system)
       else
       {
-        Console.Write("No saving path provided.");
+        Console.Write("No file/folder paths provided to save generated data.");
       }
 
       Console.WriteLine();
@@ -281,6 +337,10 @@ namespace ShipmentReconciliation
       }
     }
 
+    /// <summary>
+    /// List detailed input data tables on screen
+    /// </summary>
+    /// <param name="data"></param>
     private static void DisplayDataDetailed(Data data)
     {
       DisplayDetailed(data.CustomerOrders, "CustomerOrders:");
@@ -312,6 +372,10 @@ namespace ShipmentReconciliation
       }
     }
 
+    /// <summary>
+    /// Lists reconcoliation result records (orders to fulfill and products to store) on screen
+    /// </summary>
+    /// <param name="result"></param>
     private static void DisplayResultDetailed(Result result)
     {
       DisplayDetailed(result.CustomerOrdersToFulfill, "Fulfill:");
@@ -319,6 +383,11 @@ namespace ShipmentReconciliation
       DisplayDetailed(result.ProductsToStore, "Store:");
     }
 
+    /// <summary>
+    /// Lists records on screen
+    /// </summary>
+    /// <param name="items"></param>
+    /// <param name="title"></param>
     private static void DisplayDetailed(IEnumerable<FactoryShipment> items, string title)
     {
       Console.WriteLine(title);
@@ -329,6 +398,11 @@ namespace ShipmentReconciliation
       }
     }
 
+    /// <summary>
+    /// Lists records on screen
+    /// </summary>
+    /// <param name="items"></param>
+    /// <param name="title"></param>
     private static void DisplayDetailed(IEnumerable<CustomerOrder> items, string title)
     {
       Console.WriteLine(title);
@@ -346,22 +420,26 @@ namespace ShipmentReconciliation
     {
       Console.Write($"{nameof(SaveResult)} ... ");
 
-      if (string.IsNullOrEmpty(Settings.Default.ResultFileNameFulfill))
-      { Console.WriteLine("No filename provided where to save records of Customer Orders to fulfill."); return; }
-
-      if (!(Path.IsPathRooted(Settings.Default.ResultFileNameFulfill)) && string.IsNullOrEmpty(Settings.Default.ResultFolderPath) && string.IsNullOrEmpty(Settings.Default.FolderPath))
-      { Console.WriteLine("No file/folder path provided where to save records of Customer Orders to fulfill."); return; }
+      if (
+        //No filename provided where to save records of Customer Orders to fulfill.
+        (string.IsNullOrEmpty(Settings.Default.ResultFileNameFulfill))
+        ||
+        //No file/folder path provided where to save records of Customer Orders to fulfill.
+        (!(Path.IsPathRooted(Settings.Default.ResultFileNameFulfill)) && string.IsNullOrEmpty(Settings.Default.ResultFolderPath) && string.IsNullOrEmpty(Settings.Default.FolderPath))
+        ||
+        //No filename provided where to save records of surplus product quantities to store.
+        (string.IsNullOrEmpty(Settings.Default.ResultFileNameStore))
+        ||
+        //No file/folder path provided where to save records of surplus product quantities to store.
+        (!(Path.IsPathRooted(Settings.Default.ResultFileNameStore)) && string.IsNullOrEmpty(Settings.Default.ResultFolderPath) && string.IsNullOrEmpty(Settings.Default.FolderPath))
+        )
+        { Console.WriteLine("Missing folder path or file name. No results saved."); return; }
+      
 
       string resultFilePathFulfill =
         (System.IO.Path.IsPathRooted(Settings.Default.ResultFileNameFulfill)) ? Settings.Default.ResultFileNameFulfill :
         !string.IsNullOrEmpty(Settings.Default.ResultFolderPath) ? Path.Combine(Settings.Default.ResultFolderPath, Settings.Default.ResultFileNameFulfill) :
          Path.Combine(Settings.Default.FolderPath, Settings.Default.ResultFileNameFulfill);
-
-      if (string.IsNullOrEmpty(Settings.Default.ResultFileNameStore))
-      { Console.WriteLine("No filename provided where to save records of surplus product quantities to store."); return; }
-
-      if (!(Path.IsPathRooted(Settings.Default.ResultFileNameStore)) && string.IsNullOrEmpty(Settings.Default.ResultFolderPath) && string.IsNullOrEmpty(Settings.Default.FolderPath))
-      { Console.WriteLine("No file/folder path provided where to save records of surplus product quantities to store."); return; }
 
       string resultFilePathStore =
         (System.IO.Path.IsPathRooted(Settings.Default.ResultFileNameStore)) ? Settings.Default.ResultFileNameStore :
