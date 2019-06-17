@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace ShipmentReconciliation
 {
-  internal partial class DataFile
+  public partial class DataFile
   {
     /// <summary>
     /// Reads csv files from source folder.

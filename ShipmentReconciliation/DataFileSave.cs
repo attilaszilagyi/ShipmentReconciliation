@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 
 namespace ShipmentReconciliation
 {
-  internal partial class DataFile
+  public partial class DataFile
   {
     /// <summary>
     /// Saves Customer Order and Factory Shipment records to csv files in the provided file system folder. 

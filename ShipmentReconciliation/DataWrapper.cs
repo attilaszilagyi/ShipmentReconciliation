@@ -11,7 +11,7 @@ namespace ShipmentReconciliation
   /// total surplus and deficit
   /// </summary>
   /// <remarks>Also provides some static helper methods to order and group data records.</remarks>
-  internal class DataWrapper
+  public class DataWrapper
   {
     /// <summary>
     /// Original records

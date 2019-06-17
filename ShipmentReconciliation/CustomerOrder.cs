@@ -1,6 +1,6 @@
 ﻿namespace ShipmentReconciliation
 {
-  internal class CustomerOrder
+  public class CustomerOrder
   {
     public int OrderID { get; set; }
     public int CustomerID { get; set; }

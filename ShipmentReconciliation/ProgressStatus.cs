@@ -6,7 +6,7 @@ namespace ShipmentReconciliation
   /// Helper class for progress report of multi-threaded tasks of processing  
   /// Customer Order records and Factory Shipment records in parallel.
   /// </summary>
-  internal class ProgressStatus
+  public class ProgressStatus
   {
     /// <summary>
     /// 

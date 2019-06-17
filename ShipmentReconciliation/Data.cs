@@ -7,7 +7,7 @@ namespace ShipmentReconciliation
   /// Records of Customer Order and Factory Shipment data.
   /// </summary>
   /// <remarks>Populated by generating test data or loading csv contents from file system.</remarks>
-  internal class Data
+  public class Data
   {
     /// <summary>
     /// Customer order records.

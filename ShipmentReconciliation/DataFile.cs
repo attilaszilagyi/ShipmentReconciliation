@@ -6,7 +6,7 @@ namespace ShipmentReconciliation
   /// <summary>
   /// Csv file operations: Load from file system. Save to file system.
   /// </summary>
-  internal static partial class DataFile
+  public static partial class DataFile
   {
     /// <summary>
     /// Default Csv options.

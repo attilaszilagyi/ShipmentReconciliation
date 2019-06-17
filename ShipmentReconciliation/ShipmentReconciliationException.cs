@@ -3,7 +3,7 @@
   /// <summary>
   /// Application exception
   /// </summary>
-  internal class ShipmentReconciliationException : System.Exception
+  public class ShipmentReconciliationException : System.Exception
   {
     public ShipmentReconciliationException():base()
     {

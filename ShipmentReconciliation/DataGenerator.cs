@@ -8,7 +8,7 @@ namespace ShipmentReconciliation
   /// <summary>
   /// Generate test data
   /// </summary>
-  internal static partial class DataGenerator
+  public static partial class DataGenerator
   {
     /// <summary>
     /// Generates test data records with random item names, customer ids and quantities.

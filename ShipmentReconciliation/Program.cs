@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace ShipmentReconciliation
 {
-  internal class Program
+  public class Program
   {
     private static Data _data;
     private static DataWrapper _dataWrapper;
