@@ -250,5 +250,29 @@ namespace ShipmentReconciliation.Properties {
                 this["CsvConfigurationCulture"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ResultFileName {
+            get {
+                return ((string)(this["ResultFileName"]));
+            }
+            set {
+                this["ResultFileName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ResultFolderPath {
+            get {
+                return ((string)(this["ResultFolderPath"]));
+            }
+            set {
+                this["ResultFolderPath"] = value;
+            }
+        }
     }
 }

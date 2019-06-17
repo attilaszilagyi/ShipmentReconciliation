@@ -1,6 +1,7 @@
 ﻿using ShipmentReconciliation.Properties;
 using System;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 
 namespace ShipmentReconciliation
@@ -10,6 +11,7 @@ namespace ShipmentReconciliation
     private static Data _data;
     private static DataWrapper _dataWrapper;
     private static CsvHelper.Configuration.Configuration _csvConfiguration;
+    private static readonly Result _result;
 
     private static readonly System.Action<string> progressChanged = text => { Console.Write("\r" + text.PadRight(100)); };
 
@@ -34,6 +36,8 @@ namespace ShipmentReconciliation
             LoadData();
             ValidateData();
             ProcessData();
+            DisplayResult();
+            SaveResult();
           }
         }
       }
@@ -282,7 +286,41 @@ namespace ShipmentReconciliation
     /// </summary>
     private static void ProcessData()
     {
+      throw new NotImplementedException();
+    }
 
+    /// <summary>
+    /// List detailed result set on screen
+    /// </summary>
+    private static void DisplayResult()
+    {
+      if (!Settings.Default.Verbose)
+      {
+        return;
+      }
+
+      throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Save reconciliation result to file system
+    /// </summary>
+    private static void SaveResult()
+    {
+      Console.Write($"{nameof(SaveResult)} ... ");
+
+      if (string.IsNullOrEmpty(Settings.Default.ResultFileName))
+      { Console.WriteLine("No result filename provided."); return; }
+
+      if (!(Path.IsPathRooted(Settings.Default.ResultFileName)) && string.IsNullOrEmpty(Settings.Default.ResultFolderPath) && string.IsNullOrEmpty(Settings.Default.FolderPath))
+      { Console.WriteLine("No result file/folder path provided."); return; }
+
+      string resultFilePath =
+        (System.IO.Path.IsPathRooted(Settings.Default.ResultFileName)) ? Settings.Default.ResultFileName :
+        !string.IsNullOrEmpty(Settings.Default.ResultFolderPath) ? Path.Combine(Settings.Default.ResultFolderPath, Settings.Default.ResultFileName) :
+         Path.Combine(Settings.Default.FolderPath, Settings.Default.ResultFileName);
+
+      throw new NotImplementedException();
     }
 
     /// <summary>
