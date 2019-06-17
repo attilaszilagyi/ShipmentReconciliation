@@ -1,4 +1,6 @@
-﻿namespace ShipmentReconciliation
+﻿using System.Collections.Generic;
+
+namespace ShipmentReconciliation
 {
   public class ResultDecision
   {
@@ -9,5 +11,16 @@
       CustomerOrder = customerOrder;
       Fulfill = fulfill;
     }
+
+
+    public static IEnumerable<ResultDecision> Create(IEnumerable<CustomerOrder> customerOrders, bool fulfill)
+    {
+      foreach (var item in customerOrders)
+      {
+        yield return new ResultDecision(item, fulfill);
+      }
+    }
+
+
   }
 }

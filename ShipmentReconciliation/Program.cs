@@ -302,7 +302,7 @@ namespace ShipmentReconciliation
     private static void ProcessData()
     {
       Console.Write($"{nameof(ProcessData)} ... ");
-      _result = Reconciler.Resolve(_dataWrapper);
+      _result = Reconciler.Resolve(_dataWrapper, progressChanged);
       Console.WriteLine();
     }
 
@@ -313,11 +313,11 @@ namespace ShipmentReconciliation
     {
       if (Settings.Default.Verbose)
       {
-        DisplayResultSummary(_result);
         if (Settings.Default.DisplayResult)
         {
           DisplayResultDetailed(_result);
         }
+        DisplayResultSummary(_result);
       }
     }
 

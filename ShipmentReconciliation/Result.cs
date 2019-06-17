@@ -11,14 +11,17 @@ namespace ShipmentReconciliation
   /// <remarks></remarks>
   public class Result
   {
-
+    public Result(IEnumerable<ResultData> data)
+    {
+      Data = data;
+    }
     /// <summary>
     /// Reconciliation decisions per products.
     /// </summary>
-    public IEnumerable<ResultData> Data { get; private set; } = new HashSet<ResultData>();
+    public IEnumerable<ResultData> Data { get; private set; }// = new HashSet<ResultData>();
 
-    public void AddData(ResultData resultData)
-    { (Data as HashSet<ResultData>).Add(resultData); }
+    //public void AddData(ResultData resultData)
+    //{ (Data as HashSet<ResultData>).Add(resultData); }
 
     /// <summary>
     /// Returns all customer orders to be fulfilled.
