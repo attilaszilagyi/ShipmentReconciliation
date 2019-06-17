@@ -10,10 +10,20 @@ namespace ShipmentReconciliation
   {
     public static void Save(IEnumerable<CustomerOrder> customerOrdersToFulfill, string filePath)
     {
-      throw new NotImplementedException();
+      CsvFile.WriteToFile(customerOrdersToFulfill, filePath, null, null, null);
     }
 
     public static void Save(IEnumerable<Tuple<string, int>> productsToStore, string filePath)
-    { throw new NotImplementedException(); }
+    {
+      CsvFile.WriteToFile(Enumerate(productsToStore), filePath, null, null, null); 
+    }
+
+    public static IEnumerable<FactoryShipment> Enumerate(IEnumerable<Tuple<string, int>> productsToStore)
+    {
+      foreach (var item in productsToStore)
+      {
+        yield return new FactoryShipment() { ItemName = item.Item1, Quantity = item.Item2 };
+      }
+    }
   }
 }

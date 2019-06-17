@@ -32,14 +32,14 @@ namespace ShipmentReconciliation
         );
     }
 
-    public static void Save(IList<CustomerOrder> customerOrders, string customerOrdersFilePath, IList<FactoryShipment> factoryShipments, string factoryShipmentsFilePath, Configuration customerOrdersCsvConfiguration = null, Configuration factoryShipmentsCsvConfiguration = null, System.Action<string> progressChanged = null, [CallerMemberName] string operation = "")
+    public static void Save(IEnumerable<CustomerOrder> customerOrders, string customerOrdersFilePath, IEnumerable<FactoryShipment> factoryShipments, string factoryShipmentsFilePath, Configuration customerOrdersCsvConfiguration = null, Configuration factoryShipmentsCsvConfiguration = null, System.Action<string> progressChanged = null, [CallerMemberName] string operation = "")
     {
       CheckFolder(Path.GetDirectoryName(customerOrdersFilePath), progressChanged, operation);
       CheckFolder(Path.GetDirectoryName(factoryShipmentsFilePath), progressChanged, operation);
       SaveFiles(customerOrders, customerOrdersFilePath, factoryShipments, factoryShipmentsFilePath, customerOrdersCsvConfiguration, factoryShipmentsCsvConfiguration, progressChanged, operation);
     }
 
-    private static void SaveFiles(IList<CustomerOrder> customerOrders, string customerOrdersFilePath, IList<FactoryShipment> factoryShipments, string factoryShipmentsFilePath, Configuration customerOrdersCsvConfiguration, Configuration factoryShipmentsCsvConfiguration, System.Action<string> progressChanged, string operation)
+    private static void SaveFiles(IEnumerable<CustomerOrder> customerOrders, string customerOrdersFilePath, IEnumerable<FactoryShipment> factoryShipments, string factoryShipmentsFilePath, Configuration customerOrdersCsvConfiguration, Configuration factoryShipmentsCsvConfiguration, System.Action<string> progressChanged, string operation)
     {
       ProgressStatus status = new ProgressStatus(operation, progressChanged, 100);
       //!CsvWriter is NOT threadSafe!!!

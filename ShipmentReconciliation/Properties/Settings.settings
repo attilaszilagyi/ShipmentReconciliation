@@ -60,13 +60,13 @@
       <Value Profile="(Default)">en-GB</Value>
     </Setting>
     <Setting Name="ResultFileNameFulfill" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Fulfill.json</Value>
+      <Value Profile="(Default)">Fulfill.csv</Value>
     </Setting>
     <Setting Name="ResultFolderPath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="ResultFileNameStore" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Store.json</Value>
+      <Value Profile="(Default)">Store.csv</Value>
     </Setting>
   </Settings>
 </SettingsFile>

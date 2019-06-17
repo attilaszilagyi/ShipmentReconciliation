@@ -103,6 +103,8 @@ namespace ShipmentReconciliation
       {
         _csvConfiguration.Encoding = System.Text.Encoding.GetEncoding(Settings.Default.CsvConfigurationEncoding);
       }
+
+      CsvFile.DefaultConfiguration = _csvConfiguration;
     }
 
     /// <summary>
@@ -195,6 +197,7 @@ namespace ShipmentReconciliation
             customerOrdersCsvConfiguration: _csvConfiguration,
             factoryShipmentsCsvConfiguration: _csvConfiguration,
             progressChanged: progressChanged);
+        Settings.Default.FolderPath = folderPath;
 
       }
       //Destination file names are provided
@@ -331,9 +334,15 @@ namespace ShipmentReconciliation
         !string.IsNullOrEmpty(Settings.Default.ResultFolderPath) ? Path.Combine(Settings.Default.ResultFolderPath, Settings.Default.ResultFileNameStore) :
          Path.Combine(Settings.Default.FolderPath, Settings.Default.ResultFileNameStore);
 
-      ResultSaver.Save(_result.CustomerOrdersToFulfill, resultFilePathFulfill);
+      //ResultSaver.Save(_result.CustomerOrdersToFulfill, resultFilePathFulfill);
 
-      ResultSaver.Save(_result.ProductsToStore, resultFilePathStore);
+      //ResultSaver.Save(_result.ProductsToStore, resultFilePathStore);
+
+      DataFile.Save(_result.CustomerOrdersToFulfill, resultFilePathFulfill,
+        ResultSaver.Enumerate(_result.ProductsToStore), resultFilePathStore,
+           customerOrdersCsvConfiguration: _csvConfiguration,
+           factoryShipmentsCsvConfiguration: _csvConfiguration,
+           progressChanged: progressChanged);
 
       Console.WriteLine();
     }

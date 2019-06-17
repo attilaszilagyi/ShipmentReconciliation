@@ -253,7 +253,7 @@ namespace ShipmentReconciliation.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Fulfill.json")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Fulfill.csv")]
         public string ResultFileNameFulfill {
             get {
                 return ((string)(this["ResultFileNameFulfill"]));
@@ -277,7 +277,7 @@ namespace ShipmentReconciliation.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Store.json")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Store.csv")]
         public string ResultFileNameStore {
             get {
                 return ((string)(this["ResultFileNameStore"]));
