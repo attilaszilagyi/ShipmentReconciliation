@@ -13,7 +13,7 @@ namespace ShipmentReconciliation
     /// 1., Generates input data and stores to csv files and/or 
     /// 2., Loads input data from csv files and 
     /// 3., Processes input data, reconciliating shipments with orders 
-    /// (optimization with simple greedy algorithm and 01-knapsack problem solver minimizes surplus to store) and
+    /// (optimization with a simple algorithm and a 01-knapsack problem solver minimizes surplus to store) and
     /// 4., Lists result on screen and/or saves them to file.
     /// </summary>
     /// <param name="args"></param>
@@ -134,7 +134,7 @@ namespace ShipmentReconciliation
     /// </summary>
     private static void DisplaySettings()
     {
-      if (!Settings.Default.Verbose)
+      if (!Settings.Default.Verbose || !Settings.Default.DisplaySettings)
       { return; }
       IOrderedEnumerable<SettingsProperty> settings = Settings.Default.Properties.OfType<SettingsProperty>().OrderBy(s => s.Name);
 
@@ -171,11 +171,11 @@ namespace ShipmentReconciliation
           operation += $"{nameof(GenerateData)} ";
           if (!string.IsNullOrEmpty(Settings.Default.FolderPath))
           {
-            Console.WriteLine($"Subfolder: {_subFolderID}");
+            Console.WriteLine($"\tSubfolder: {_subFolderID}");
           }
           else if (string.IsNullOrEmpty(Settings.Default.FilePathCustomerOrders) || string.IsNullOrEmpty(Settings.Default.FilePathFactoryShipment))
           {//no destination path provided (=> we don't save data to file system)
-            Console.WriteLine("No file/folder paths provided to save generated data.");
+            Console.WriteLine("\tNo file/folder paths provided to save generated data.");
           }
         }
 
@@ -184,20 +184,20 @@ namespace ShipmentReconciliation
           operation += $"{nameof(ProcessData)} ";
 
           if (string.IsNullOrEmpty(Settings.Default.ResultFileNameFulfill))
-          { Console.WriteLine("No filename provided where to save records of Customer Orders to fulfill."); }
+          { Console.WriteLine("\tNo filename provided where to save records of the selected customer orders to fulfill."); }
 
           if (!(Path.IsPathRooted(Settings.Default.ResultFileNameFulfill)) && string.IsNullOrEmpty(Settings.Default.ResultFolderPath) && string.IsNullOrEmpty(Settings.Default.FolderPath))
-          { Console.WriteLine("No file/folder path provided where to save records of Customer Orders to fulfill."); }
+          { Console.WriteLine("\tNo file/folder path provided where to save records of the selected customer orders to fulfill."); }
 
           if (string.IsNullOrEmpty(Settings.Default.ResultFileNameStore))
-          { Console.WriteLine("No filename provided where to save records of surplus product quantities to store."); }
+          { Console.WriteLine("\tNo filename provided where to save records of surplus product quantities to store."); }
 
           if (!(Path.IsPathRooted(Settings.Default.ResultFileNameStore)) && string.IsNullOrEmpty(Settings.Default.ResultFolderPath) && string.IsNullOrEmpty(Settings.Default.FolderPath))
-          { Console.WriteLine("No file/folder path provided where to save records of surplus product quantities to store."); }
+          { Console.WriteLine("\tNo file/folder path provided where to save records of surplus product quantities to store."); }
 
         }
 
-        Console.WriteLine("Operation: " + operation);
+        Console.WriteLine("\tOperation: " + operation);
 
 
         if (!Settings.Default.AutoStart)
@@ -328,6 +328,7 @@ namespace ShipmentReconciliation
             Console.WriteLine();
             DisplayDataDetailed(_data);
           }
+          else { Console.WriteLine(); }
           DisplayDataSummary(_dataWrapper);
         }
         else

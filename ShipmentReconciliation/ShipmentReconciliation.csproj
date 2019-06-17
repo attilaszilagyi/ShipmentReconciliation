@@ -80,6 +80,9 @@
     <Compile Include="StringEx.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="readme.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="App.config" />
     <Content Include="DATA\TEST\CustomerOrders.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
