@@ -6,13 +6,28 @@ namespace ShipmentReconciliation
 {
   public static class Reconciler
   {
-
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="dataWrapper"></param>
+    /// <param name="optimizerLimit">Maximum number of different combinations to try. Zero: no limit.</param>
+    /// <param name="progressChanged"></param>
+    /// <param name="operation"></param>
+    /// <returns></returns>
     public static Result Resolve(DataWrapper dataWrapper, int optimizerLimit, System.Action<string> progressChanged = null, [CallerMemberName] string operation = "")
     {
       Result result = new Result(new HashSet<ResultData>(GetResults(dataWrapper, optimizerLimit, progressChanged, operation)));
       return result;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="dataWrapper"></param>
+    /// <param name="optimizerLimit">Maximum number of different combinations to try. Zero: no limit.</param>
+    /// <param name="progressChanged"></param>
+    /// <param name="operation"></param>
+    /// <returns></returns>
     public static IEnumerable<ResultData> GetResults(DataWrapper dataWrapper, int optimizerLimit, System.Action<string> progressChanged, string operation)
     {
 
@@ -21,35 +36,42 @@ namespace ShipmentReconciliation
       {
         string product = item.Key;
         int balance = item.Value;
-        int shipped = dataWrapper.SumFactoryShipments[product];
-
+        int shipped = dataWrapper.SumFactoryShipments.ContainsKey(product) ? dataWrapper.SumFactoryShipments[product] : 0;
+        if (shipped == 0)
+        {
+          //None of the orders can be fulfilled, but there is nothing to store
+          yield return new ResultData(product, shipped, ResultDecision.Create(dataWrapper.GetCustomerOrdersByItemName(product), fulfill: false));
+        }
+        else
         if (balance == 0)
         {
           //All orders fulfill, nothing to store
-          yield return new ResultData(product, shipped, ResultDecision.Create(dataWrapper.GetCustomerOrdersByItemName(product), true));
+          yield return new ResultData(product, shipped, ResultDecision.Create(dataWrapper.GetCustomerOrdersByItemName(product), fulfill: true));
         }
-
+        else
         if (balance > 0)
         {
           //All orders fulfill, there are some product item from the factory shipments to store
-          yield return new ResultData(product, shipped, ResultDecision.Create(dataWrapper.GetCustomerOrdersByItemName(product), true));
+          yield return new ResultData(product, shipped, ResultDecision.Create(dataWrapper.GetCustomerOrdersByItemName(product), fulfill: true));
         }
-
+        else
         if (balance < 0)
         {
           //Some orders may be fulfilled, but not all. Optimization needed. Some product items from the factory shipments might be to store.
-
+          IEnumerable<ResultDecision> decisionsComplex = null;double efficiencyComplex = 0;
           IEnumerable<ResultDecision> decisionsSimple = ResolverSimple.Resolve(shipped, dataWrapper.GetCustomerOrdersByItemName(product), out double efficiencySimple);
           if (efficiencySimple < 1)
           {
-            IEnumerable<ResultDecision> decisionsComplex = ResolverComplex.Resolve(optimizerLimit, shipped, dataWrapper.GetCustomerOrdersByItemName(product).ToArray(), efficiencySimple, out double efficiencyComplex);
-            if (efficiencyComplex > efficiencySimple)
-            {
-              yield return new ResultData(product, shipped, decisionsComplex);
-            }
+            decisionsComplex = ResolverComplex.Resolve(optimizerLimit, shipped, dataWrapper.GetCustomerOrdersByItemName(product).ToArray(), efficiencySimple, out efficiencyComplex);            
           }
-
-          yield return new ResultData(product, shipped, decisionsSimple);
+          if (efficiencyComplex > efficiencySimple)
+          {
+            yield return new ResultData(product, shipped, decisionsComplex);
+          }
+          else
+          {
+            yield return new ResultData(product, shipped, decisionsSimple);
+          }
         }
 
       }

@@ -5,8 +5,20 @@ using System.Linq;
 
 namespace ShipmentReconciliation
 {
+  /// <summary>
+  /// Optimization with 01-Knapsack algorithm
+  /// </summary>
   public static class ResolverComplex
   {
+    /// <summary>
+    /// Optimize with 01-Knapsack algorithm
+    /// </summary>
+    /// <param name="optimizerLimit">Maximum number of different combinations to try. Zero: no limit.</param>
+    /// <param name="shipped">Total quantity of Factory Shipments of the product</param>
+    /// <param name="orders">List of Customer Orders of the product</param>
+    /// <param name="efficiencyMin">Minimal efficiency of a combination. Restriction of the 01-Knapsack solver.</param>
+    /// <param name="efficiency">Efficiency achieved by the 01-Knapsack solver. This is a return parameter. If it is 0, then no results provided back.</param>
+    /// <returns></returns>
     public static IEnumerable<ResultDecision> Resolve(int optimizerLimit, int shipped, CustomerOrder[] orders, double efficiencyMin, out double efficiency)
     {
       efficiency = 0;
