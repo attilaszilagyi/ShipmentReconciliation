@@ -1,0 +1,20 @@
+Per Item Name
+Quantity Sum
+1. Customer order > Factory shipment – some order will not be served, some item might be stored
+2. Customer order = Factory shipment – all orders will be served, no items shall be stored
+3. Customer order < Factory shipment – all orders will be served, some items must be stored
+
+Factory shipment may contain the same item name multiple times, so first we shall aggregate the quantities by item name.
+
+The same customer might have placed multiple orders. Shall we serve these in order? Not necesserily.
+
+Shall we optimize to reduced storage, or serve the orders in FIFO? YES!
+
+1., 
+Orders: 9, 7, 4 Sum:20 Shipment: 11 minimum number of items to store=20-11=9 => deliver 9, store: 7 + 4
+
+Csökkenõ sorrendbe tesszük a megrendeléseket mennyiség szerint
+Megkeressük az elsõ megrendelést, amely kisebb, vagy egyenlõ, mint a shipment quantity sum
+Ha egyenlõ, akkor ez megy ki, a többi marad
+Ha kisebb, akkor megnézzük, hogy van-e olyan, amivel egyenlõ, ha kisebb, betesszük, és keressük a  következõt, amivel egyenlõ, ha kisebb, betesszük, ha nagyobb, kivesszük az elõzõt, és betesszük ezt
+a1

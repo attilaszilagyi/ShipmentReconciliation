@@ -301,7 +301,9 @@ namespace ShipmentReconciliation
     /// </summary>
     private static void ProcessData()
     {
+      Console.Write($"{nameof(ProcessData)} ... ");
       _result = Reconciler.Resolve(_dataWrapper);
+      Console.WriteLine();
     }
 
     /// <summary>
