@@ -11,7 +11,6 @@ namespace ShipmentReconciliation
   {
     private static Data _data;
     private static DataWrapper _dataWrapper;
-    private static CsvHelper.Configuration.Configuration _csvConfiguration;
     private static Result _result;
 
     private static readonly System.Action<string> progressChanged = text => { Console.Write("\r" + text.PadRight(100)); };
@@ -94,18 +93,18 @@ namespace ShipmentReconciliation
         }
       }
 
-      _csvConfiguration = !string.IsNullOrEmpty(Settings.Default.CsvConfigurationCulture) ? new CsvHelper.Configuration.Configuration(new System.Globalization.CultureInfo(Settings.Default.CsvConfigurationCulture)) : new CsvHelper.Configuration.Configuration();
+      var csvConfiguration = !string.IsNullOrEmpty(Settings.Default.CsvConfigurationCulture) ? new CsvHelper.Configuration.Configuration(new System.Globalization.CultureInfo(Settings.Default.CsvConfigurationCulture)) : new CsvHelper.Configuration.Configuration();
       if (!string.IsNullOrEmpty(Settings.Default.CsvConfigurationDelimiter))
       {
-        _csvConfiguration.Delimiter = Settings.Default.CsvConfigurationDelimiter;
+        csvConfiguration.Delimiter = Settings.Default.CsvConfigurationDelimiter;
       }
 
       if (!string.IsNullOrEmpty(Settings.Default.CsvConfigurationEncoding))
       {
-        _csvConfiguration.Encoding = System.Text.Encoding.GetEncoding(Settings.Default.CsvConfigurationEncoding);
+        csvConfiguration.Encoding = System.Text.Encoding.GetEncoding(Settings.Default.CsvConfigurationEncoding);
       }
 
-      CsvFile.DefaultConfiguration = _csvConfiguration;
+      CsvFile.DefaultConfiguration = csvConfiguration;
     }
 
     /// <summary>
@@ -195,8 +194,6 @@ namespace ShipmentReconciliation
         string folderPath = System.IO.Path.Combine(Settings.Default.FolderPath, subFolderID);
         Console.Write(folderPath);
         DataFile.Save(_data, folderPath,
-            customerOrdersCsvConfiguration: _csvConfiguration,
-            factoryShipmentsCsvConfiguration: _csvConfiguration,
             progressChanged: progressChanged);
         Settings.Default.FolderPath = folderPath;
 
@@ -208,8 +205,6 @@ namespace ShipmentReconciliation
           Settings.Default.FilePathCustomerOrders,
           _data.FactoryShipments,
           Settings.Default.FilePathFactoryShipment,
-            customerOrdersCsvConfiguration: _csvConfiguration,
-            factoryShipmentsCsvConfiguration: _csvConfiguration,
             progressChanged: progressChanged);
 
 
@@ -241,8 +236,6 @@ namespace ShipmentReconciliation
             Settings.Default.FolderSearchSubs ? System.IO.SearchOption.AllDirectories : System.IO.SearchOption.TopDirectoryOnly,
             Settings.Default.FolderSearchPatternCustomerOrders,
             Settings.Default.FolderSearchPatternFactoryShipment,
-            customerOrdersCsvConfiguration: _csvConfiguration,
-            factoryShipmentsCsvConfiguration: _csvConfiguration,
             progressChanged: progressChanged);
         }
         else if (!string.IsNullOrEmpty(Settings.Default.FilePathCustomerOrders) && !string.IsNullOrEmpty(Settings.Default.FilePathFactoryShipment))
@@ -250,8 +243,6 @@ namespace ShipmentReconciliation
           _data = DataFile.Load(
             Settings.Default.FilePathCustomerOrders,
             Settings.Default.FilePathFactoryShipment,
-            customerOrdersCsvConfiguration: _csvConfiguration,
-            factoryShipmentsCsvConfiguration: _csvConfiguration,
             progressChanged: progressChanged);
         }
         else
@@ -380,8 +371,6 @@ namespace ShipmentReconciliation
       DataFile.Save(
            _result.CustomerOrdersToFulfill, resultFilePathFulfill,
            _result.ProductsToStore, resultFilePathStore,
-           customerOrdersCsvConfiguration: _csvConfiguration,
-           factoryShipmentsCsvConfiguration: _csvConfiguration,
            progressChanged: progressChanged);
 
       Console.WriteLine();
