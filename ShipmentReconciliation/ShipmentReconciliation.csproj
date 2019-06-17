@@ -49,6 +49,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Batch.cs" />
+    <Compile Include="CsvFile.cs" />
     <Compile Include="CustomerOrder.cs" />
     <Compile Include="DataFile.cs" />
     <Compile Include="DataGenerator.cs" />
@@ -70,8 +72,10 @@
     <Compile Include="Result.cs" />
     <Compile Include="ResultData.cs" />
     <Compile Include="ResultDecision.cs" />
+    <Compile Include="ResultSaver.cs" />
     <Compile Include="ShipmentReconciliationException.cs" />
     <Compile Include="ProgressStatus.cs" />
+    <Compile Include="StringEx.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

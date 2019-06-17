@@ -1,5 +1,4 @@
-﻿using CsvHelper;
-using CsvHelper.Configuration;
+﻿using CsvHelper.Configuration;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -48,35 +47,18 @@ namespace ShipmentReconciliation
       //    Task.Factory.StartNew(() => WriteToFile(customerOrders, customerOrdersFilePath, customerOrdersCsvConfiguration, (count, message) => { status.CustomerOrderMessage = message; status.CustomerOrderCount = count; })),
       //    Task.Factory.StartNew(() => WriteToFile(factoryShipments, factoryShipmentsFilePath, factoryShipmentsCsvConfiguration, (count, message) => { status.FactoryShipmentMessage = message; status.FactoryShipmentCount = count; }))
       //    );
-      WriteToFile(customerOrders, customerOrdersFilePath, customerOrdersCsvConfiguration, (count, message) => { status.CustomerOrderMessage = message; status.CustomerOrderCount = count; });
-      WriteToFile(factoryShipments, factoryShipmentsFilePath, factoryShipmentsCsvConfiguration, (count, message) => { status.FactoryShipmentMessage = message; status.FactoryShipmentCount = count; });
+      CsvFile.WriteToFile(customerOrders, customerOrdersFilePath, customerOrdersCsvConfiguration, (count, message) => { status.CustomerOrderMessage = message; status.CustomerOrderCount = count; }, operation);
+      CsvFile.WriteToFile(factoryShipments, factoryShipmentsFilePath, factoryShipmentsCsvConfiguration, (count, message) => { status.FactoryShipmentMessage = message; status.FactoryShipmentCount = count; }, operation);
       status.Report();
     }
 
     private static void CheckFolder(string path, System.Action<string> progressChanged, string progressOperation)
     {
-      progressChanged?.Invoke($"{progressOperation} {nameof(CheckFolder)} {Trim(path)}");
+      progressChanged?.Invoke($"{progressOperation} {nameof(CheckFolder)} {path.TrimPath()}");
       if (!Directory.Exists(path))
       { Directory.CreateDirectory(path); }
     }
 
-    private static void WriteToFile<T>(IEnumerable<T> records, string path, Configuration csvConfiguration, System.Action<int, string> progressChanged)
-    {
-      //progressChanged?.Invoke(0, Trim(path));
-      using (StreamWriter writer = new StreamWriter(path))
-      using (CsvWriter csv = new CsvWriter(writer, csvConfiguration ?? DefaultConfiguration))
-      {
-        if (progressChanged == null)
-        { csv.WriteRecords(records); }
-        else
-        {
-          csv.WriteHeader<T>();
-          int cntRecords = ProcessRecords(records, (item) => { csv.NextRecord(); csv.WriteRecord(item); }, progressChanged, null);
-          //progressChanged?.Invoke(cntRecords, Trim(path));
-        }
-
-      }
-    }
 
   }
 }

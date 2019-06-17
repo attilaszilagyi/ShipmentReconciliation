@@ -309,18 +309,33 @@ namespace ShipmentReconciliation
     {
       Console.Write($"{nameof(SaveResult)} ... ");
 
-      if (string.IsNullOrEmpty(Settings.Default.ResultFileName))
-      { Console.WriteLine("No result filename provided."); return; }
+      if (string.IsNullOrEmpty(Settings.Default.ResultFileNameFulfill))
+      { Console.WriteLine("No filename provided where to save records of Customer Orders to fulfill."); return; }
 
-      if (!(Path.IsPathRooted(Settings.Default.ResultFileName)) && string.IsNullOrEmpty(Settings.Default.ResultFolderPath) && string.IsNullOrEmpty(Settings.Default.FolderPath))
-      { Console.WriteLine("No result file/folder path provided."); return; }
+      if (!(Path.IsPathRooted(Settings.Default.ResultFileNameFulfill)) && string.IsNullOrEmpty(Settings.Default.ResultFolderPath) && string.IsNullOrEmpty(Settings.Default.FolderPath))
+      { Console.WriteLine("No file/folder path provided where to save records of Customer Orders to fulfill."); return; }
 
-      string resultFilePath =
-        (System.IO.Path.IsPathRooted(Settings.Default.ResultFileName)) ? Settings.Default.ResultFileName :
-        !string.IsNullOrEmpty(Settings.Default.ResultFolderPath) ? Path.Combine(Settings.Default.ResultFolderPath, Settings.Default.ResultFileName) :
-         Path.Combine(Settings.Default.FolderPath, Settings.Default.ResultFileName);
+      string resultFilePathFulfill =
+        (System.IO.Path.IsPathRooted(Settings.Default.ResultFileNameFulfill)) ? Settings.Default.ResultFileNameFulfill :
+        !string.IsNullOrEmpty(Settings.Default.ResultFolderPath) ? Path.Combine(Settings.Default.ResultFolderPath, Settings.Default.ResultFileNameFulfill) :
+         Path.Combine(Settings.Default.FolderPath, Settings.Default.ResultFileNameFulfill);
 
-      throw new NotImplementedException();
+      if (string.IsNullOrEmpty(Settings.Default.ResultFileNameStore))
+      { Console.WriteLine("No filename provided where to save records of surplus product quantities to store."); return; }
+
+      if (!(Path.IsPathRooted(Settings.Default.ResultFileNameStore)) && string.IsNullOrEmpty(Settings.Default.ResultFolderPath) && string.IsNullOrEmpty(Settings.Default.FolderPath))
+      { Console.WriteLine("No file/folder path provided where to save records of surplus product quantities to store."); return; }
+
+      string resultFilePathStore =
+        (System.IO.Path.IsPathRooted(Settings.Default.ResultFileNameStore)) ? Settings.Default.ResultFileNameStore :
+        !string.IsNullOrEmpty(Settings.Default.ResultFolderPath) ? Path.Combine(Settings.Default.ResultFolderPath, Settings.Default.ResultFileNameStore) :
+         Path.Combine(Settings.Default.FolderPath, Settings.Default.ResultFileNameStore);
+
+      ResultSaver.Save(_result.CustomerOrdersToFulfill, resultFilePathFulfill);
+
+      ResultSaver.Save(_result.ProductsToStore, resultFilePathStore);
+
+      Console.WriteLine();
     }
 
     /// <summary>

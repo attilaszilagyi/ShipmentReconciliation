@@ -253,13 +253,13 @@ namespace ShipmentReconciliation.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string ResultFileName {
+        [global::System.Configuration.DefaultSettingValueAttribute("Fulfill.json")]
+        public string ResultFileNameFulfill {
             get {
-                return ((string)(this["ResultFileName"]));
+                return ((string)(this["ResultFileNameFulfill"]));
             }
             set {
-                this["ResultFileName"] = value;
+                this["ResultFileNameFulfill"] = value;
             }
         }
         
@@ -272,6 +272,18 @@ namespace ShipmentReconciliation.Properties {
             }
             set {
                 this["ResultFolderPath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Store.json")]
+        public string ResultFileNameStore {
+            get {
+                return ((string)(this["ResultFileNameStore"]));
+            }
+            set {
+                this["ResultFileNameStore"] = value;
             }
         }
     }

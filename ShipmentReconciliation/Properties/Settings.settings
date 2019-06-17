@@ -59,11 +59,14 @@
     <Setting Name="CsvConfigurationCulture" Type="System.String" Scope="User">
       <Value Profile="(Default)">en-GB</Value>
     </Setting>
-    <Setting Name="ResultFileName" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+    <Setting Name="ResultFileNameFulfill" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Fulfill.json</Value>
     </Setting>
     <Setting Name="ResultFolderPath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ResultFileNameStore" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Store.json</Value>
     </Setting>
   </Settings>
 </SettingsFile>

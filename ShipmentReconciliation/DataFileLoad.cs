@@ -34,6 +34,32 @@ namespace ShipmentReconciliation
       progressChanged?.Invoke($"{operation} CustomerOrder: {cntRecordCustomerOrders:N0} records in {cntFileCustomerOrders:N0} files, FactoryShipment: {cntRecordFactoryShipments:N0} records in {cntFileFactoryShipments:N0} files.");
       return inputData;
     }
+    
+    /// <summary>
+    /// Reads one Customer Order csv file and one Factory Shipment csv file.
+    /// </summary>
+    /// <param name="customerOrdersFilePath">File system path of the Customer Order csv file.</param>
+    /// <param name="factoryShipmentsFilePath">File system path of the Factory Shipment csv file.</param>
+    /// <param name="customerOrdersCsvConfiguration">Csv configuration to parse Customer Order files</param>
+    /// <param name="factoryShipmentsCsvConfiguration">Csv configuration to parse Factory Shipment files</param>
+    /// <param name="progressChanged">Callback for progress report</param>
+    /// <param name="operation">Title text for progress report</param>
+    /// <returns></returns>
+    public static Data Load(string customerOrdersFilePath, string factoryShipmentsFilePath, Configuration customerOrdersCsvConfiguration = null, Configuration factoryShipmentsCsvConfiguration = null, System.Action<string> progressChanged = null, [CallerMemberName] string operation = "")
+    {
+      progressChanged?.Invoke($"{operation} CustomerOrders...");
+      IList<CustomerOrder> customerOrders = CsvFile.ReadFromFile<CustomerOrder>(customerOrdersFilePath, customerOrdersCsvConfiguration, progressChanged, operation, cntRecords: out int cntRecordCustomerOrders);
+      progressChanged?.Invoke($"{operation} FactoryShipments...");
+      IList<FactoryShipment> factoryShipments = CsvFile.ReadFromFile<FactoryShipment>(factoryShipmentsFilePath, factoryShipmentsCsvConfiguration, progressChanged, operation, cntRecords: out int cntRecordFactoryShipments);
+      Data inputData = new Data
+      {
+        CustomerOrders = customerOrders,
+        FactoryShipments = factoryShipments
+      };
+      progressChanged?.Invoke($"{operation} CustomerOrder: {cntRecordCustomerOrders:N0} records, FactoryShipment: {cntRecordFactoryShipments:N0} records.");
+      return inputData;
+    }
+
 
     private static void CheckParams(string customerOrdersSearchPattern, string factoryShipmentsSearchPattern)
     {
@@ -52,34 +78,9 @@ namespace ShipmentReconciliation
       { throw new ShipmentReconciliationException("Missing file search pattern: " + errorMessage); }
     }
 
-    /// <summary>
-    /// Reads one Customer Order csv file and one Factory Shipment csv file.
-    /// </summary>
-    /// <param name="customerOrdersFilePath">File system path of the Customer Order csv file.</param>
-    /// <param name="factoryShipmentsFilePath">File system path of the Factory Shipment csv file.</param>
-    /// <param name="customerOrdersCsvConfiguration">Csv configuration to parse Customer Order files</param>
-    /// <param name="factoryShipmentsCsvConfiguration">Csv configuration to parse Factory Shipment files</param>
-    /// <param name="progressChanged">Callback for progress report</param>
-    /// <param name="operation">Title text for progress report</param>
-    /// <returns></returns>
-    public static Data Load(string customerOrdersFilePath, string factoryShipmentsFilePath, Configuration customerOrdersCsvConfiguration = null, Configuration factoryShipmentsCsvConfiguration = null, System.Action<string> progressChanged = null, [CallerMemberName] string operation = "")
-    {
-      progressChanged?.Invoke($"{operation} CustomerOrders...");
-      IList<CustomerOrder> customerOrders = LoadFromFile<CustomerOrder>(customerOrdersFilePath, customerOrdersCsvConfiguration, progressChanged, operation, cntRecords: out int cntRecordCustomerOrders);
-      progressChanged?.Invoke($"{operation} FactoryShipments...");
-      IList<FactoryShipment> factoryShipments = LoadFromFile<FactoryShipment>(factoryShipmentsFilePath, factoryShipmentsCsvConfiguration, progressChanged, operation, cntRecords: out int cntRecordFactoryShipments);
-      Data inputData = new Data
-      {
-        CustomerOrders = customerOrders,
-        FactoryShipments = factoryShipments
-      };
-      progressChanged?.Invoke($"{operation} CustomerOrder: {cntRecordCustomerOrders:N0} records, FactoryShipment: {cntRecordFactoryShipments:N0} records.");
-      return inputData;
-    }
-
     private static IList<T> LoadFromFolder<T>(string folderPath, string searchPattern, SearchOption searchOption, Configuration csvConfiguration, System.Action<string> progressChanged, string operation, out int cntFile, out int cntRecordsTotal)
     {
-      string progressTitle = $"{operation} {nameof(LoadFromFolder)} {Trim(folderPath)} {searchPattern}";
+      string progressTitle = $"{operation} {nameof(LoadFromFolder)} {folderPath.TrimPath()} {searchPattern}";
       progressChanged?.Invoke(progressTitle);
       string[] files = Directory.GetFiles(folderPath, searchPattern, searchOption);
       List<T> cache = new List<T>();
@@ -90,31 +91,10 @@ namespace ShipmentReconciliation
       {
         cntFile++;
         progressChanged?.Invoke($"{progressTitle} {cntFile:N0}/{allFiles:N0}");
-        IEnumerable<T> records = LoadFromFile<T>(file, csvConfiguration, progressChanged, operation, out int cntRecords);
+        IEnumerable<T> records = CsvFile.ReadFromFile<T>(file, csvConfiguration, progressChanged, operation, out int cntRecords);
         cache.AddRange(records);
         cntRecordsTotal += cntRecords;
         progressChanged?.Invoke($"{progressTitle} {cntRecordsTotal:N0}");
-      }
-      return cache;
-    }
-
-    private static IList<T> LoadFromFile<T>(string filePath, Configuration csvConfiguration, System.Action<string> progressChanged, string operation, out int cntRecords)
-    {
-      string progressTitle = $"{operation} {nameof(LoadFromFile)} {Trim(filePath)}";
-      progressChanged?.Invoke(progressTitle);
-      List<T> cache = new List<T>();
-      using (StreamReader reader = new StreamReader(filePath))
-      using (CsvHelper.CsvReader csv = new CsvHelper.CsvReader(reader, csvConfiguration ?? DefaultConfiguration))
-      {
-        csv.Configuration.PrepareHeaderForMatch = (string header, int index) => header.Replace(" ", "");
-        IEnumerable<T> records = csv.GetRecords<T>();
-        if (progressChanged == null)
-        { cache.AddRange(records); cntRecords = cache.Count; }
-        else
-        {
-          cntRecords = ProcessRecords(records, (item) => { cache.Add(item); }, progressChanged, progressTitle);
-          progressChanged($"{progressTitle} {cntRecords:N0}");
-        }
       }
       return cache;
     }
