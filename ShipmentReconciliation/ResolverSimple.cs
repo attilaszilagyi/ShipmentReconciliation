@@ -6,14 +6,11 @@ using System.Threading.Tasks;
 
 namespace ShipmentReconciliation
 {
-  public static class Reconciler
+  public static class ResolverSimple
   {
-
     public static Result Resolve(DataWrapper dataWrapper)
     {
-      dataWrapper.GetCustomerOrdersByItemName
       throw new NotImplementedException();
     }
-
   }
 }

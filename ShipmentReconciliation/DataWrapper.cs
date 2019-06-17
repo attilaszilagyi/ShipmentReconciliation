@@ -59,8 +59,8 @@ namespace ShipmentReconciliation
     /// <remarks>You may call this method explicitly only after the associated Data record collections changed.</remarks>
     public void Recalculate()
     {
-      SumFactoryShipments = CalculateSum(GetFactoryShipmentsByItemName());
-      SumCustomerOrders = CalculateSum(GetCustomerOrdersByItemName());
+      SumFactoryShipments = CalculateSum(GetFactoryShipmentsGroupedByItemName());
+      SumCustomerOrders = CalculateSum(GetCustomerOrdersGroupedByItemName());
       Balance = new Dictionary<string, int>();
       foreach (KeyValuePair<string, int> item in SumCustomerOrders)
       {
@@ -132,16 +132,16 @@ namespace ShipmentReconciliation
     /// Groups records by products.
     /// </summary>
     /// <returns></returns>
-    public IOrderedEnumerable<IGrouping<string, CustomerOrder>> GetCustomerOrdersByItemName()
+    public IOrderedEnumerable<IGrouping<string, CustomerOrder>> GetCustomerOrdersGroupedByItemName()
     {
-      return GetCustomerOrdersByItemName(Data);
+      return GetCustomerOrdersGroupedByItemName(Data);
     }
 
     /// <summary>
     /// Groups records by products.
     /// </summary>
     /// <returns></returns>
-    public static IOrderedEnumerable<IGrouping<string, CustomerOrder>> GetCustomerOrdersByItemName(Data data)
+    public static IOrderedEnumerable<IGrouping<string, CustomerOrder>> GetCustomerOrdersGroupedByItemName(Data data)
     {
       return
         from record in data.CustomerOrders
@@ -154,16 +154,16 @@ namespace ShipmentReconciliation
     /// Groups records by products.
     /// </summary>
     /// <returns></returns>
-    public IOrderedEnumerable<IGrouping<string, FactoryShipment>> GetFactoryShipmentsByItemName()
+    public IOrderedEnumerable<IGrouping<string, FactoryShipment>> GetFactoryShipmentsGroupedByItemName()
     {
-      return GetFactoryShipmentsByItemName(Data);
+      return GetFactoryShipmentsGroupedByItemName(Data);
     }
 
     /// <summary>
     /// Groups records by products.
     /// </summary>
     /// <returns></returns>
-    public static IOrderedEnumerable<IGrouping<string, FactoryShipment>> GetFactoryShipmentsByItemName(Data data)
+    public static IOrderedEnumerable<IGrouping<string, FactoryShipment>> GetFactoryShipmentsGroupedByItemName(Data data)
     {
       return
        from record in data.FactoryShipments
@@ -171,5 +171,28 @@ namespace ShipmentReconciliation
        orderby itemNameGroup.Key
        select itemNameGroup;
     }
+
+    /// <summary>
+    /// Returns records filtered to a product, and sorted ascending by quantity.
+    /// </summary>
+    /// <returns></returns>
+    public IOrderedEnumerable< CustomerOrder> GetCustomerOrdersByItemName(string itemName)
+    {
+      return GetCustomerOrdersByItemName(Data, itemName);
+    }
+
+    /// <summary>
+    /// Returns records filtered to a product, and sorted ascending by quantity.
+    /// </summary>
+    /// <returns></returns>
+    public static IOrderedEnumerable< CustomerOrder> GetCustomerOrdersByItemName(Data data, string itemName)
+    {
+      return
+        from record in data.CustomerOrders
+        where record.ItemName == itemName
+        orderby record.Quantity
+        select record;
+    }
+
   }
 }

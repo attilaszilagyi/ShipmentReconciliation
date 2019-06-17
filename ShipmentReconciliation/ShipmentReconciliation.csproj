@@ -65,7 +65,10 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Reconciler.cs" />
+    <Compile Include="ResolverComplex.cs" />
+    <Compile Include="ResolverSimple.cs" />
     <Compile Include="Result.cs" />
+    <Compile Include="ResultData.cs" />
     <Compile Include="ResultDecision.cs" />
     <Compile Include="ShipmentReconciliationException.cs" />
     <Compile Include="ProgressStatus.cs" />
