@@ -302,7 +302,7 @@ namespace ShipmentReconciliation
     private static void ProcessData()
     {
       Console.Write($"{nameof(ProcessData)} ... ");
-      _result = Reconciler.Resolve(_dataWrapper, progressChanged);
+      _result = Reconciler.Resolve(_dataWrapper, Settings.Default.OptimizerLimit, progressChanged);
       Console.WriteLine();
     }
 

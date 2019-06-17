@@ -1,9 +1,10 @@
 ﻿Order ID;Customer ID;Item Name;Quantity
-1;1;Product1;100
-2;1;Product2;200
-3;2;Product1;200
+1;1;Product1;1000
+2;1;Product7;200
+3;2;Product4;200
 4;3;Product3;300
-5;3;Product2;290
-6;4;Product2;310
-7;5;Product2;650
-8;6;Product2;300
+5;3;Product7;290
+6;4;Product7;310
+7;5;Product7;650
+8;6;Product7;300
+9;7;Product4;100

@@ -310,5 +310,17 @@ namespace ShipmentReconciliation.Properties {
                 this["DisplayResult"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int OptimizerLimit {
+            get {
+                return ((int)(this["OptimizerLimit"]));
+            }
+            set {
+                this["OptimizerLimit"] = value;
+            }
+        }
     }
 }
