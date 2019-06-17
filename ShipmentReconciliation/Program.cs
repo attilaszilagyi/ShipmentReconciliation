@@ -1,5 +1,6 @@
 ﻿using ShipmentReconciliation.Properties;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
@@ -275,7 +276,12 @@ namespace ShipmentReconciliation
 
         if (Settings.Default.Verbose)
         {
-          DisplaySummary(_dataWrapper);
+          if (Settings.Default.DisplayData)
+          {
+            Console.WriteLine();
+            DisplayDataDetailed(_data);
+          }
+          DisplayDataSummary(_dataWrapper);
         }
         else
         {
@@ -284,12 +290,18 @@ namespace ShipmentReconciliation
       }
     }
 
+    private static void DisplayDataDetailed(Data data)
+    {
+      DisplayDetailed(data.CustomerOrders, "CustomerOrders:");
+      DisplayDetailed(data.FactoryShipments, "FactoryShipments:");
+    }
+
     /// <summary>
     /// Reconcile the customer orders with the factory shipment
     /// </summary>
     private static void ProcessData()
     {
-      throw new NotImplementedException();
+      //throw new NotImplementedException();
     }
 
     /// <summary>
@@ -297,12 +309,41 @@ namespace ShipmentReconciliation
     /// </summary>
     private static void DisplayResult()
     {
-      if (!Settings.Default.Verbose)
+      if (Settings.Default.Verbose)
       {
-        return;
+        DisplayResultSummary(_result);
+        if (Settings.Default.DisplayResult)
+        {
+          DisplayResultDetailed(_result);
+        }
       }
+    }
 
-      throw new NotImplementedException();
+    private static void DisplayResultDetailed(Result result)
+    {
+      DisplayDetailed(result.CustomerOrdersToFulfill, "Fulfill:");
+
+      DisplayDetailed(result.ProductsToStore, "Store:");
+    }
+
+    private static void DisplayDetailed(IEnumerable<FactoryShipment> items, string title)
+    {
+      Console.WriteLine(title);
+      Console.WriteLine($"\tItemName\tQuantity");
+      foreach (FactoryShipment item in items)
+      {
+        Console.WriteLine($"\t{item.ItemName}\t{item.Quantity}");
+      }
+    }
+
+    private static void DisplayDetailed(IEnumerable<CustomerOrder> items, string title)
+    {
+      Console.WriteLine(title);
+      Console.WriteLine($"\tID\tCustID\tItemName\tQuantity");
+      foreach (CustomerOrder item in items)
+      {
+        Console.WriteLine($"\t{item.OrderID}\t{item.CustomerID}\t{item.ItemName}\t{item.Quantity}");
+      }
     }
 
     /// <summary>
@@ -334,12 +375,9 @@ namespace ShipmentReconciliation
         !string.IsNullOrEmpty(Settings.Default.ResultFolderPath) ? Path.Combine(Settings.Default.ResultFolderPath, Settings.Default.ResultFileNameStore) :
          Path.Combine(Settings.Default.FolderPath, Settings.Default.ResultFileNameStore);
 
-      //ResultSaver.Save(_result.CustomerOrdersToFulfill, resultFilePathFulfill);
-
-      //ResultSaver.Save(_result.ProductsToStore, resultFilePathStore);
-
-      DataFile.Save(_result.CustomerOrdersToFulfill, resultFilePathFulfill,
-        ResultSaver.Enumerate(_result.ProductsToStore), resultFilePathStore,
+      DataFile.Save(
+           _result.CustomerOrdersToFulfill, resultFilePathFulfill,
+           _result.ProductsToStore, resultFilePathStore,
            customerOrdersCsvConfiguration: _csvConfiguration,
            factoryShipmentsCsvConfiguration: _csvConfiguration,
            progressChanged: progressChanged);
@@ -353,14 +391,26 @@ namespace ShipmentReconciliation
     /// <param name="dataWrapper"></param>
     /// <param name="title"></param>
     /// <param name="indent"></param>
-    private static void DisplaySummary(DataWrapper dataWrapper, string title = "Summary:", string indent = "\t")
+    private static void DisplayDataSummary(DataWrapper dataWrapper, string title = "Summary:", string indent = "\t")
     {
       Console.WriteLine($"{title}");
       Console.WriteLine($"{indent}CustomerOrder: {dataWrapper.CountItemCustomerOrders:N0} items in {dataWrapper.CountRecordCustomerOrders:N0} orders of {dataWrapper.CountProductCustomerOrders:N0} products.");
       Console.WriteLine($"{indent}FactoryShipment: {dataWrapper.CountItemFactoryShipment:N0} items in {dataWrapper.CountRecordFactoryShipment:N0} shipments of {dataWrapper.CountProductFactoryShipment:N0} products.");
       Console.WriteLine($"{indent}TotalSurplus: {dataWrapper.TotalSurplus:N0} items of {dataWrapper.CountProductSurplus:N0} products.");
       Console.WriteLine($"{indent}TotalDeficit: {dataWrapper.TotalDeficit:N0} items of {dataWrapper.CountProductDeficit:N0} products.");
+    }
 
+    /// <summary>
+    /// List pre-processed data on screen.
+    /// </summary>
+    /// <param name="dataWrapper"></param>
+    /// <param name="title"></param>
+    /// <param name="indent"></param>
+    private static void DisplayResultSummary(Result result, string title = "Summary:", string indent = "\t")
+    {
+      Console.WriteLine($"{title}");
+      Console.WriteLine($"{indent}Fulfill: {result.CustomerOrdersToFulfill.Sum(cof => cof.Quantity):N0} items in {result.CustomerOrdersToFulfill.Count():N0} orders.");
+      Console.WriteLine($"{indent}Store: {result.ProductsToStore.Sum(pts => pts.Quantity):N0} items of {result.ProductsToStore.Count():N0} products.");
     }
 
     /// <summary>

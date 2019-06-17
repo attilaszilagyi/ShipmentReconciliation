@@ -68,5 +68,11 @@
     <Setting Name="ResultFileNameStore" Type="System.String" Scope="User">
       <Value Profile="(Default)">Store.csv</Value>
     </Setting>
+    <Setting Name="DisplayData" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="DisplayResult" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

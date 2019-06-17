@@ -72,7 +72,6 @@
     <Compile Include="Result.cs" />
     <Compile Include="ResultData.cs" />
     <Compile Include="ResultDecision.cs" />
-    <Compile Include="ResultSaver.cs" />
     <Compile Include="ShipmentReconciliationException.cs" />
     <Compile Include="ProgressStatus.cs" />
     <Compile Include="StringEx.cs" />

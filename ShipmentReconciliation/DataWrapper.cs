@@ -13,10 +13,18 @@ namespace ShipmentReconciliation
   /// <remarks>Also provides some static helper methods to order and group data records.</remarks>
   public class DataWrapper
   {
+
+    public DataWrapper(Data data/*, bool calculateSums = true, bool calculateCounts = true, bool calculateBalance = true*/)
+    {
+      Data = data;
+      Recalculate();
+    }
+
     /// <summary>
     /// Original records
     /// </summary>
-    public Data Data { get; }
+    private readonly Data Data;
+
     /// <summary>
     /// Summed Quantities of Customer Orders grouped by Item Name
     /// </summary>
@@ -25,6 +33,14 @@ namespace ShipmentReconciliation
     /// Summed Quantities of Factory Shipments grouped by Item Name
     /// </summary>
     public Dictionary<string, int> SumFactoryShipments { get; private set; }
+
+    public int CountItemCustomerOrders { get; private set; }
+    public int CountItemFactoryShipment { get; private set; }
+    public int CountRecordCustomerOrders { get; private set; }
+    public int CountRecordFactoryShipment { get; private set; }
+    public int CountProductCustomerOrders { get; private set; }
+    public int CountProductFactoryShipment { get; private set; }
+
     /// <summary>
     /// ShippedQuantity - OrderedQuantity per products. Positive value: we have more than enough items to fullfill the orders. Negative value: we have less items than needed to fullfill the orders.
     /// </summary>
@@ -37,21 +53,15 @@ namespace ShipmentReconciliation
     /// Sum of all shortage in all products
     /// </summary>
     public int TotalDeficit { get; private set; }
-
-    public int CountItemCustomerOrders { get; private set; }
-    public int CountItemFactoryShipment { get; private set; }
-    public int CountRecordCustomerOrders { get; private set; }
-    public int CountRecordFactoryShipment { get; private set; }
-    public int CountProductCustomerOrders { get; private set; }
-    public int CountProductFactoryShipment { get; private set; }
+    /// <summary>
+    /// Number of products where total quantities of Customer Orders exceeds the total quantities of Factory Shipments
+    /// </summary>
     public int CountProductDeficit { get; private set; }
+    /// <summary>
+    /// Number of products where total quantities of Factory Shipments exceeds the total quantities of Customer Orders
+    /// </summary>
     public int CountProductSurplus { get; private set; }
 
-    public DataWrapper(Data data)
-    {
-      Data = data;
-      Recalculate();
-    }
 
     /// <summary>
     /// Pre-processes Data records. Calculates sums, counts, and aggregated balances of quantities by products.
@@ -176,7 +186,7 @@ namespace ShipmentReconciliation
     /// Returns records filtered to a product, and sorted ascending by quantity.
     /// </summary>
     /// <returns></returns>
-    public IOrderedEnumerable< CustomerOrder> GetCustomerOrdersByItemName(string itemName)
+    public IOrderedEnumerable<CustomerOrder> GetCustomerOrdersByItemName(string itemName)
     {
       return GetCustomerOrdersByItemName(Data, itemName);
     }
@@ -185,7 +195,7 @@ namespace ShipmentReconciliation
     /// Returns records filtered to a product, and sorted ascending by quantity.
     /// </summary>
     /// <returns></returns>
-    public static IOrderedEnumerable< CustomerOrder> GetCustomerOrdersByItemName(Data data, string itemName)
+    public static IOrderedEnumerable<CustomerOrder> GetCustomerOrdersByItemName(Data data, string itemName)
     {
       return
         from record in data.CustomerOrders

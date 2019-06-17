@@ -41,15 +41,15 @@ namespace ShipmentReconciliation
     }
 
     /// <summary>
-    /// Returns the products (item name) and the surplus quantity to store.
+    /// Returns the products (item name) and the surplus (quantity) to store.
     /// </summary>
-    public IEnumerable<Tuple<string, int>> ProductsToStore
+    public IEnumerable<FactoryShipment> ProductsToStore
     {
       get
       {
         foreach (ResultData resultData in Data.Where(r => r.Surplus > 0))
         {
-          yield return new Tuple<string, int>(resultData.Product, resultData.Surplus);
+          yield return new FactoryShipment() { ItemName = resultData.Product, Quantity = resultData.Surplus };
         }
       }
     }

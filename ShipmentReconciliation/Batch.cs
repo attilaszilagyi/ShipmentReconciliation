@@ -2,6 +2,9 @@
 
 namespace ShipmentReconciliation
 {
+  /// <summary>
+  /// Helper class for some batch operation on records
+  /// </summary>
   public static class Batch
   {
     public static int ProcessRecords<T>(IEnumerable<T> records, System.Action<T> process, System.Action<string> progressChanged, string operation, int reportPerCount = 100)

@@ -286,5 +286,29 @@ namespace ShipmentReconciliation.Properties {
                 this["ResultFileNameStore"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool DisplayData {
+            get {
+                return ((bool)(this["DisplayData"]));
+            }
+            set {
+                this["DisplayData"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool DisplayResult {
+            get {
+                return ((bool)(this["DisplayResult"]));
+            }
+            set {
+                this["DisplayResult"] = value;
+            }
+        }
     }
 }
