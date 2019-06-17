@@ -510,7 +510,7 @@ namespace ShipmentReconciliation
       {
         return;
       }
-      Console.WriteLine("Press ENTER to exit...");
+      Console.Write("Press ENTER to exit...");
       Console.ReadLine();
     }
   }
