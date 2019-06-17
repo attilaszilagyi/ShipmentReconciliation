@@ -14,7 +14,7 @@ namespace ShipmentReconciliation
   public class DataWrapper
   {
 
-    public DataWrapper(Data data/*, bool calculateSums = true, bool calculateCounts = true, bool calculateBalance = true*/)
+    public DataWrapper(Data data)
     {
       Data = data;
       Recalculate();
@@ -23,7 +23,7 @@ namespace ShipmentReconciliation
     /// <summary>
     /// Original records
     /// </summary>
-    private readonly Data Data;
+    public Data Data { get; private set; }
 
     /// <summary>
     /// Summed Quantities of Customer Orders grouped by Item Name

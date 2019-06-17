@@ -12,7 +12,7 @@ namespace ShipmentReconciliation
     private static Data _data;
     private static DataWrapper _dataWrapper;
     private static CsvHelper.Configuration.Configuration _csvConfiguration;
-    private static readonly Result _result;
+    private static Result _result;
 
     private static readonly System.Action<string> progressChanged = text => { Console.Write("\r" + text.PadRight(100)); };
 
@@ -301,7 +301,7 @@ namespace ShipmentReconciliation
     /// </summary>
     private static void ProcessData()
     {
-      //throw new NotImplementedException();
+      _result = Reconciler.Resolve(_dataWrapper);
     }
 
     /// <summary>

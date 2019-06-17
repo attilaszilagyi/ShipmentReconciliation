@@ -11,8 +11,11 @@ namespace ShipmentReconciliation
 
     public static Result Resolve(DataWrapper dataWrapper)
     {
+      Result result = new Result();
       //dataWrapper.GetCustomerOrdersByItemName
-      throw new NotImplementedException();
+      //throw new NotImplementedException();
+      
+      return result;
     }
 
   }

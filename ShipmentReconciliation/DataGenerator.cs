@@ -80,9 +80,8 @@ namespace ShipmentReconciliation
         total += quantity;
         if (total > maxTotalQuantityPerProduct)
         {
-          total = 0;
+          total = quantity;
           iProduct++;
-          continue;
         }
         records.Add(new CustomerOrder()
         {
