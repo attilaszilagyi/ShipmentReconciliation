@@ -16,9 +16,9 @@ namespace ShipmentReconciliation
     /// <returns></returns>
     public static Result Resolve(DataWrapper dataWrapper, int optimizerLimit, System.Action<string> progressChanged = null, [CallerMemberName] string operation = "")
     {
-      progressChanged?.Invoke($"{operation}");
+      
       Result result = new Result(new HashSet<ResultData>(GetResults(dataWrapper, optimizerLimit, progressChanged, operation)));
-      progressChanged?.Invoke($"{operation} {result.}");
+      
       return result;
     }
 
@@ -37,7 +37,7 @@ namespace ShipmentReconciliation
       foreach (KeyValuePair<string, int> item in dataWrapper.Balance)
       {        
         string product = item.Key;
-        progressChanged?.Invoke($"{operation} {++cnt}/{cntMax} {product}");
+        progressChanged?.Invoke($"{operation} {++cnt}/{cntMax}");
         int balance = item.Value;
         int shipped = dataWrapper.SumFactoryShipments.ContainsKey(product) ? dataWrapper.SumFactoryShipments[product] : 0;
         if (shipped == 0)

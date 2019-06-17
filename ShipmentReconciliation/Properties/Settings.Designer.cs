@@ -85,7 +85,7 @@ namespace ShipmentReconciliation.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("DATA\\TEST")]
         public string FolderPath {
             get {
                 return ((string)(this["FolderPath"]));
@@ -289,7 +289,7 @@ namespace ShipmentReconciliation.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool DisplayData {
             get {
                 return ((bool)(this["DisplayData"]));
@@ -301,7 +301,7 @@ namespace ShipmentReconciliation.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool DisplayResult {
             get {
                 return ((bool)(this["DisplayResult"]));
@@ -313,7 +313,7 @@ namespace ShipmentReconciliation.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1000")]
         public int OptimizerLimit {
             get {
                 return ((int)(this["OptimizerLimit"]));
