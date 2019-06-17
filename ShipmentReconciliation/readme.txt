@@ -18,7 +18,9 @@ Main Steps:
     4., Lists result on screen and/or saves them to file.
 
 Application Settings:
+
   DATATYPE  NAME                                    DEFAULT                         NOTES
+  
   bool      AutoExit:                               False                           Set to "True" to automatically exit application when finished performing the selected operation(s), otherwise the program will asks for user confirmation.
   bool      AutoStart:                              False                           Set to "True" to automatically start performing the selected operation(s), otherwise the program will asks for user confirmation.
   string    CsvConfigurationCulture:                en-GB                           Csv file option. Language code table to use.
@@ -48,10 +50,20 @@ Application Settings:
 
 Command line parameters:
 
-  Every application setting can be provided as command line parameter in the form Name=Value. In case of bool variables you may omit "=true" (eg. AutoExit=True equals AutoExit). Values containing white space caracters must be enclosed in double quotes (FolderPath="DATA\Test folder 001").
+  Every application setting can be provided as command line parameter in the form: Name=Value (eg. OptimizerLimit=100).
+  In case of bool variables you may omit "=true" (eg. AutoExit=True equals AutoExit). 
+  Values containing white space caracters must be enclosed in double quotes (eg. FolderPath="DATA\Test folder 001").
 
   Examples:
 	
 	ShipmentReconciliation.exe GenerateData=true ProcessData=true AutoStart Verbose=true FolderPath= ResultFolderPath= DisplaySettings=false DisplayData=false DisplayResult=false
 	ShipmentReconciliation.exe GenerateData=true ProcessData=false AutoStart Verbose=false FolderPath=DATA\AUTO DisplayData DisplayResult
 	ShipmentReconciliation.exe GenerateData=false ProcessData=true AutoStart Verbose=true FolderPath=DATA\TEST FolderSearchSubs ResultFolderPath= DisplaySettings=false DisplayData=false DisplayResult=false
+	ShipmentReconciliation.exe GenerateData=true ProcessData=true AutoStart Verbose=false FolderPath=DATA\AUTO DisplaySettings=false DisplayData=false DisplayResult=false
+
+
+Default Files:
+	* CustomerOrders.csv             Input file. Customer Order records to reconciliate. Fields: Order ID, Customer ID, Item Name, Quantity.
+	* FactoryShipments.csv           Input file. Factory Shipment records to reconciliate. Fields: Item Name, Quantity.
+	* Fulfill.csv                    Output file. Customer Order records to fulfill. Fields: OrderID, CustomerID, ItemName, Quantity.
+	* Store.csv                      Output file. Product items (surplus quantites) to store. Fields: ItemName, Quantity.
