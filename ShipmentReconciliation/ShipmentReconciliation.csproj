@@ -64,6 +64,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="Reconciler.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="ResultDecision.cs" />
     <Compile Include="ShipmentReconciliationException.cs" />
