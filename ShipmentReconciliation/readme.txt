@@ -48,6 +48,9 @@ Application Settings:
   string    ResultFolderPath:                                                       If empty, it falls back to FolderPath.
   bool      Verbose:                                True                            Set it to "False" if You don't want to see detailed progress reports, operation phase summaries, and detailed tables/lists of records.
 
+
+The default values can be changed in the ShipmentReconciliation.exe.config file
+
 Command line parameters:
 
   Every application setting can be provided as command line parameter in the form: Name=Value (eg. OptimizerLimit=100).
@@ -67,3 +70,17 @@ Default Files:
 	* FactoryShipments.csv           Input file. Factory Shipment records to reconciliate. Fields: Item Name, Quantity.
 	* Fulfill.csv                    Output file. Customer Order records to fulfill. Fields: OrderID, CustomerID, ItemName, Quantity.
 	* Store.csv                      Output file. Product items (surplus quantites) to store. Fields: ItemName, Quantity.
+
+
+Author:
+	Attila Szilagyi	
+	http://szilagyiattila.hu
+	email: contact@szilagyiattila.hu
+	phone: +36205716499
+
+Credits/Nuget packages: 
+	Microsoft.Solver.Foundation
+	CsvHelper
+
+
+Copyright@Attila Szilagyi, 2019
